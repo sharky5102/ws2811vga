@@ -27,7 +27,7 @@ def render():
     gl.glClear(gl.GL_COLOR_BUFFER_BIT)
     
     model = np.eye(4, dtype=np.float32)
-    transforms.translate(model, math.sin(0.1*t*math.pi*2) * 5, 0, 0)
+    transforms.translate(model, math.sin(0.01*t*math.pi*2) * 5, 0, 0)
 
     projection = np.eye(4, dtype=np.float32)
     transforms.scale(projection, .2, 1, 1)

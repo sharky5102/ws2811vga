@@ -23,14 +23,14 @@ class circle(geometry.base):
 
 class texquad(geometry.base):
     vertex_code = """
-        #version 120
+        #version 150
         uniform mat4 modelview;
         uniform mat4 projection;
         
-        attribute vec2 position;
-        attribute vec2 texcoor;
+        in vec2 position;
+        in vec2 texcoor;
 
-        varying vec2 v_texcoor;
+        out vec2 v_texcoor;
         
         void main()
         {
@@ -39,12 +39,23 @@ class texquad(geometry.base):
         } """
 
     fragment_code = """
+        #version 150
+
         uniform sampler2D tex;
-        varying vec2 v_texcoor;
+        out vec4 f_color;
+        in vec2 v_texcoor;
         
         void main()
         {
-            gl_FragColor = texture2D(tex, v_texcoor);
+            float pixsize_x = 1.0/50;
+            float pixsize_y = 1.0/10;
+            
+            vec2 coor;
+            
+            coor.x = (floor(v_texcoor.x/pixsize_x)+0.5)*pixsize_x;
+            coor.y = (floor(v_texcoor.y/pixsize_y)+0.5)*pixsize_y;
+
+            f_color = textureLod(tex, coor, 2);
         } """
         
     def loadGeometry(self):
@@ -98,6 +109,7 @@ class texquad(geometry.base):
         gl.glUniform1i(loc, 0)
         gl.glActiveTexture(gl.GL_TEXTURE0)
         gl.glBindTexture(gl.GL_TEXTURE_2D, self.tex)
+        gl.glGenerateMipmap(gl.GL_TEXTURE_2D)
 
         loc = gl.glGetAttribLocation(self.program, "position")
         gl.glEnableVertexAttribArray(loc)
