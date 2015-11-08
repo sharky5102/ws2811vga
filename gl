@@ -1,0 +1,86 @@
+#! /usr/bin/env python
+# -*- coding: utf-8 -*-
+# -----------------------------------------------------------------------------
+# Copyright (c) 2014, Nicolas P. Rougier. All rights reserved.
+# Distributed under the terms of the new BSD License.
+# -----------------------------------------------------------------------------
+import sys
+import ctypes
+import numpy as np
+import OpenGL.GL as gl
+import OpenGL.GLUT as glut
+import math
+import transforms
+import time
+import fbo
+import geometry.simple
+
+preview = True #False
+
+start = time.time()
+
+def render():
+    global start, circle
+    t = time.time() - start
+    
+    gl.glClearColor(0, 0, 0, 0)    
+    gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+    
+    model = np.eye(4, dtype=np.float32)
+    transforms.translate(model, math.sin(0.1*t*math.pi*2) * 5, 0, 0)
+
+    projection = np.eye(4, dtype=np.float32)
+    transforms.scale(projection, .2, 1, 1)
+
+    circle.setModelView(model)
+    circle.setProjection(projection)
+    circle.render()
+
+
+def display():
+    global mainfbo
+    global texquad
+    
+    with mainfbo:
+        render()
+
+    gl.glClearColor(0, 0, 0, 0)
+    gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+            
+    texquad.render()
+            
+    glut.glutSwapBuffers()
+    glut.glutPostRedisplay()
+    
+def reshape(width,height):
+    gl.glViewport(0, 0, width, height)
+
+def keyboard( key, x, y ):
+    if key == '\033':
+        sys.exit( )
+
+
+# GLUT init
+# --------------------------------------
+glut.glutInit()
+glut.glutInitDisplayMode(glut.GLUT_DOUBLE | glut.GLUT_RGBA)
+glut.glutCreateWindow('Amazing ws2811 VGA renderer')
+if preview:
+    glut.glutReshapeWindow(500,100)
+else:
+    glut.glutReshapeWindow(840,500)
+glut.glutReshapeFunc(reshape)
+glut.glutDisplayFunc(display)
+glut.glutKeyboardFunc(keyboard)
+
+circle = geometry.simple.circle()
+
+
+mainfbo = fbo.FBO(512, 128)
+texquad = geometry.simple.texquad()
+texquad.setTexture(mainfbo.getTexture())
+
+# Enter mainloop
+# --------------------------------------
+#glut.glutFullScreen()
+glut.glutMainLoop()
