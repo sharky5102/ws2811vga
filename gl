@@ -16,7 +16,7 @@ import fbo
 import geometry.simple
 
 preview = True #False
-raw = True
+raw = False
 
 start = time.time()
 

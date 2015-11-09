@@ -5,7 +5,7 @@ import math
 import transforms
 import ctypes
 
-class base:
+class base(object):
     """Base class for 2d geometries with modelview and projection transforms"""    
     
     vertex_code = """
@@ -27,6 +27,9 @@ class base:
         {
             gl_FragColor = vec4(1,1,1,1) + v_color;
         } """
+
+    attributes = { 'color' : 4, 'position' : 2 }
+    primitive = gl.GL_TRIANGLES
 
     def __init__(self):
         self.program = self.loadShaderProgram();
@@ -78,26 +81,35 @@ class base:
         gl.glBindBuffer(gl.GL_ARRAY_BUFFER, buffer)
 
         # Build data
-        (verts, colors) = self.getVertices()
+        verts = self.getVertices()
         
-        if len(colors) != len(verts):
-            raise RuntimeError('len(colors) != len(verts)')
+        size = None
+        for attrib in verts:
+            if size == None:
+                size = len(verts[attrib]) 
+                continue
+            if size != len(verts[attrib]):
+                raise RuntimeError('not all attribute arrays have the same length')
 
-        data = np.zeros(len(verts), [("position", np.float32, 2),
-                                     ("color",    np.float32, 4)])
+        format = []
+        for attrib in self.attributes:
+            format.append( (attrib, np.float32, self.attributes[attrib]) )
 
+        data = np.zeros(size, format)
 
-        data['color']    = colors
-        data['position'] = verts
+        offset = 0
+        self.offsets = {}
+        for attrib in self.attributes:
+            data[attrib] = verts[attrib]
+            self.offsets[attrib] = ctypes.c_void_p(offset)
+            offset += data.dtype[attrib].itemsize
 
         self.stride = data.strides[0]
-        self.offset = ctypes.c_void_p(data.dtype["position"].itemsize)
-        
 
         # Upload data
         gl.glBufferData(gl.GL_ARRAY_BUFFER, data.nbytes, data, gl.GL_DYNAMIC_DRAW)
 
-        return buffer, len(verts)
+        return buffer, size
     
     def setModelView(self, M):
         self.modelview = M
@@ -117,14 +129,14 @@ class base:
         loc = gl.glGetUniformLocation(self.program, "projection")
         gl.glUniformMatrix4fv(loc, 1, False, self.projection)
 
-        loc = gl.glGetAttribLocation(self.program, "position")
-        gl.glEnableVertexAttribArray(loc)
-        gl.glBindBuffer(gl.GL_ARRAY_BUFFER, self.vertexBuffer)
-        gl.glVertexAttribPointer(loc, 3, gl.GL_FLOAT, False, self.stride, ctypes.c_void_p(0))
+        for attrib in self.attributes:
+            loc = gl.glGetAttribLocation(self.program, attrib)
+            gl.glEnableVertexAttribArray(loc)
+            gl.glBindBuffer(gl.GL_ARRAY_BUFFER, self.vertexBuffer)
+            gl.glVertexAttribPointer(loc, self.attributes[attrib], gl.GL_FLOAT, False, self.stride, self.offsets[attrib])
 
-        loc = gl.glGetAttribLocation(self.program, "color")
-        gl.glEnableVertexAttribArray(loc)
-        gl.glBindBuffer(gl.GL_ARRAY_BUFFER, self.vertexBuffer)
-        gl.glVertexAttribPointer(loc, 4, gl.GL_FLOAT, False, self.stride, self.offset)
-
-        gl.glDrawArrays(gl.GL_TRIANGLES, 0, self.vertices)
+        self.draw()
+        
+    def draw(self):
+        
+        gl.glDrawArrays(self.primitive, 0, self.vertices)
