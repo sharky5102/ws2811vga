@@ -16,6 +16,7 @@ import fbo
 import geometry.simple
 
 preview = True #False
+raw = True
 
 start = time.time()
 
@@ -27,7 +28,7 @@ def render():
     gl.glClear(gl.GL_COLOR_BUFFER_BIT)
     
     model = np.eye(4, dtype=np.float32)
-    transforms.translate(model, math.sin(0.01*t*math.pi*2) * 5, 0, 0)
+    transforms.translate(model, math.sin(0.005*t*math.pi*2) * 5, 0, 0)
 
     projection = np.eye(4, dtype=np.float32)
     transforms.scale(projection, .2, 1, 1)
@@ -41,13 +42,16 @@ def display():
     global mainfbo
     global texquad
     
-    with mainfbo:
+    if raw:
         render()
+    else:
+        with mainfbo:
+            render()
 
-    gl.glClearColor(0, 0, 0, 0)
-    gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+        gl.glClearColor(0, 0, 0, 0)
+        gl.glClear(gl.GL_COLOR_BUFFER_BIT)
             
-    texquad.render()
+        texquad.render()
             
     glut.glutSwapBuffers()
     glut.glutPostRedisplay()
