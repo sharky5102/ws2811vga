@@ -14,6 +14,7 @@ import transforms
 import time
 import fbo
 import geometry.simple
+import geometry.video
 
 preview = True #False
 raw = False
@@ -21,7 +22,8 @@ raw = False
 start = time.time()
 
 def render():
-    global start, circle
+    global start, circle, vid
+    
     t = time.time() - start
     
     gl.glClearColor(0, 0, 0, 0)    
@@ -36,6 +38,8 @@ def render():
     circle.setModelView(model)
     circle.setProjection(projection)
     circle.render()
+    
+    vid.render()
 
 
 def display():
@@ -78,7 +82,12 @@ glut.glutDisplayFunc(display)
 glut.glutKeyboardFunc(keyboard)
 
 circle = geometry.simple.circle()
+vid = geometry.video.video('test4.mp4')
 
+M = np.eye(4, dtype=np.float32)
+transforms.scale(M, 1, 3, 1)
+
+vid.setModelView(M)
 
 mainfbo = fbo.FBO(512, 128)
 texquad = geometry.simple.texquad()

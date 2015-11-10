@@ -54,8 +54,16 @@ class texquad(geometry.base):
             
             coor.x = (floor(v_texcoor.x/pixsize_x)+0.5)*pixsize_x;
             coor.y = (floor(v_texcoor.y/pixsize_y)+0.5)*pixsize_y;
-
-            f_color = textureLod(tex, coor, 2);
+            
+            vec2 d = v_texcoor - coor;
+            d.x *= 5;
+            
+            float p = 1-length(d)*20;
+            float p2 = length(d) > 0.5 * pixsize_x ? 0.0 : 1.0;
+            
+            vec4 t = textureLod(tex, coor, 2);
+            
+            f_color = t * p * 0.5 + t * p2 * 0.5;
         } """
         
     attributes = { 'position' : 2, 'texcoor' : 2 }
