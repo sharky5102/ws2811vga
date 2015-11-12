@@ -56,7 +56,7 @@ class video(geometry.simple.texquad):
             ret, frame = self.cap.read()
             gl.glBindTexture(gl.GL_TEXTURE_RECTANGLE, self.tex)
             gl.glTexImage2D(gl.GL_TEXTURE_RECTANGLE, 0, gl.GL_RGB, self.w, self.h, 0, gl.GL_BGR, gl.GL_UNSIGNED_BYTE, frame.tostring())
-            self.n = 2
+            self.n = 1
         else:
             self.n -= 1
         

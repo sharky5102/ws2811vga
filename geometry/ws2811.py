@@ -4,24 +4,7 @@ import OpenGL.GL as gl
 import numpy as np
 import ctypes
 
-class circle(geometry.base):
-    segs = 16
-    
-    def getVertices(self):
-        colors = []
-        verts = []
-
-        for i in range(0,self.segs):
-             colors.append((1,1,1,1))
-             colors.append((1,1,1,1))
-             colors.append((1,1,1,1))
-             verts.append((0,0))
-             verts.append((math.sin(math.pi*2*i/self.segs), math.cos(math.pi*2*i/self.segs)))
-             verts.append((math.sin(math.pi*2*(i+1)/self.segs), math.cos(math.pi*2*(i+1)/self.segs)))
-
-        return { 'position' : verts, 'color' : colors }
-
-class texquad(geometry.base):
+class signalgenerator(geometry.base):
     vertex_code = """
         #version 150
         uniform mat4 modelview;
@@ -47,23 +30,41 @@ class texquad(geometry.base):
         
         void main()
         {
-            float pixsize_x = 1.0/50;
-            float pixsize_y = 1.0/10;
+            int y = int(v_texcoor.y * 998);
+            int pixel = y / 2;
+            int subpixel = y % 2;
             
-            vec2 coor;
+            int bit = int(v_texcoor.x * 12); // 12 bits per scanline
+            bit += int(subpixel * 12); // second scanline
             
-            coor.x = (floor(v_texcoor.x/pixsize_x)+0.5)*pixsize_x;
-            coor.y = (floor(v_texcoor.y/pixsize_y)+0.5)*pixsize_y;
+            float sourcex = (float(pixel % 50) + 0.5) / 50;
+            float sourcey = (float(pixel / 50) + 0.5) / 10;
             
-            vec2 d = v_texcoor - coor;
-            d.x *= 5;
+            // Reverse odd scanline sampling locations for snake trail
+            if ((pixel / 50) % 2 == 1)
+                sourcex = 1 - sourcex;
+                
+            vec4 t = textureLod(tex, vec2(sourcex, 1 - sourcey), 3);
             
-            float p = 1-length(d)*20;
-            float p2 = length(d) > 1.0 * pixsize_x ? 0.0 : 1.0;
+            int ledvalue = int(t.r * 255);
+            ledvalue = ledvalue << 8;
+            ledvalue |= int(t.g * 255);
+            ledvalue = ledvalue << 8;
+            ledvalue |= int(t.b * 255);
             
-            vec4 t = textureLod(tex, coor, 2);
+            int bitvalue = (ledvalue >> bit) & 1;
             
-            f_color = t * p + t * p2 ;
+            float bitoffset = (v_texcoor.x * 12) - (bit % 12);
+            
+            float color;
+            
+            if(bitvalue == 0)
+                color = bitoffset < 0.2 ? 1 : 0;
+            else
+                color = bitoffset < 0.5 ? 1 : 0;
+
+            f_color = vec4(color, color, color, 1);
+            
         } """
         
     attributes = { 'position' : 2, 'texcoor' : 2 }
@@ -82,7 +83,7 @@ class texquad(geometry.base):
         gl.glBindTexture(gl.GL_TEXTURE_2D, self.tex)
         gl.glGenerateMipmap(gl.GL_TEXTURE_2D)
         
-        super(texquad, self).draw()
+        super(signalgenerator, self).draw()
 
     def setTexture(self, tex):
         self.tex = tex

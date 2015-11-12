@@ -15,8 +15,9 @@ import time
 import fbo
 import geometry.simple
 import geometry.video
+import geometry.ws2811
 
-preview = True #False
+preview = False
 raw = False
 
 start = time.time()
@@ -30,14 +31,14 @@ def render():
     gl.glClear(gl.GL_COLOR_BUFFER_BIT)
     
     model = np.eye(4, dtype=np.float32)
-    transforms.translate(model, math.sin(0.005*t*math.pi*2) * 5, 0, 0)
+    transforms.translate(model, math.sin(0.05*t*math.pi*2) * 5, 0, 0)
 
     projection = np.eye(4, dtype=np.float32)
     transforms.scale(projection, .2, 1, 1)
 
     circle.setModelView(model)
     circle.setProjection(projection)
-    circle.render()
+#    circle.render()
     
     vid.render()
 
@@ -54,9 +55,12 @@ def display():
 
         gl.glClearColor(0, 0, 0, 0)
         gl.glClear(gl.GL_COLOR_BUFFER_BIT)
-            
-        texquad.render()
-            
+        
+        if preview:   
+            texquad.render()
+        else:
+            signalgenerator.render()
+                
     glut.glutSwapBuffers()
     glut.glutPostRedisplay()
     
@@ -74,24 +78,27 @@ glut.glutInit()
 glut.glutInitDisplayMode(glut.GLUT_DOUBLE | glut.GLUT_RGBA)
 glut.glutCreateWindow('Amazing ws2811 VGA renderer')
 if preview:
-    glut.glutReshapeWindow(500,100)
+    glut.glutReshapeWindow(1500,300)
 else:
-    glut.glutReshapeWindow(840,500)
+    glut.glutReshapeWindow(840,1000)
 glut.glutReshapeFunc(reshape)
 glut.glutDisplayFunc(display)
 glut.glutKeyboardFunc(keyboard)
 
 circle = geometry.simple.circle()
-vid = geometry.video.video('test4.mp4')
+vid = geometry.video.video('test7.mp4')
 
 M = np.eye(4, dtype=np.float32)
-transforms.scale(M, 1, 3, 1)
+transforms.scale(M, 2, 6, 1)
 
 vid.setModelView(M)
 
 mainfbo = fbo.FBO(512, 128)
 texquad = geometry.simple.texquad()
 texquad.setTexture(mainfbo.getTexture())
+
+signalgenerator = geometry.ws2811.signalgenerator()
+signalgenerator.setTexture(mainfbo.getTexture())
 
 # Enter mainloop
 # --------------------------------------
