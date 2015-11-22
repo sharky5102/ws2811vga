@@ -26,12 +26,12 @@ def render():
     global start, circle, vid
     
     t = time.time() - start
-    
+
     gl.glClearColor(0, 0, 0, 0)    
     gl.glClear(gl.GL_COLOR_BUFFER_BIT)
     
     model = np.eye(4, dtype=np.float32)
-    transforms.translate(model, math.sin(0.05*t*math.pi*2) * 5, 0, 0)
+    transforms.translate(model, math.sin(0.5*t*math.pi*2) * 5, 0, 0)
 
     projection = np.eye(4, dtype=np.float32)
     transforms.scale(projection, .2, 1, 1)
@@ -77,7 +77,7 @@ def keyboard( key, x, y ):
 glut.glutInit()
 glut.glutInitDisplayMode(glut.GLUT_DOUBLE | glut.GLUT_RGBA)
 glut.glutCreateWindow('Amazing ws2811 VGA renderer')
-if preview:
+if preview or raw:
     glut.glutReshapeWindow(1500,300)
 else:
     glut.glutReshapeWindow(840,1000)
@@ -86,11 +86,11 @@ glut.glutDisplayFunc(display)
 glut.glutKeyboardFunc(keyboard)
 
 circle = geometry.simple.circle()
-vid = geometry.video.video('test7.mp4')
+vid = geometry.video.video('test2.mp4')
 
 M = np.eye(4, dtype=np.float32)
 transforms.scale(M, 2, 6, 1)
-
+transforms.translate(M, 0, -1, 0)
 vid.setModelView(M)
 
 mainfbo = fbo.FBO(512, 128)
@@ -102,5 +102,6 @@ signalgenerator.setTexture(mainfbo.getTexture())
 
 # Enter mainloop
 # --------------------------------------
-#glut.glutFullScreen()
+if not raw and not preview:
+    glut.glutFullScreen()
 glut.glutMainLoop()

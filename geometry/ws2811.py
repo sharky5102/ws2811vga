@@ -30,7 +30,7 @@ class signalgenerator(geometry.base):
         
         void main()
         {
-            int y = int(v_texcoor.y * 998);
+            int y = int(v_texcoor.y * 1000);
             int pixel = y / 2;
             int subpixel = y % 2;
             
@@ -44,7 +44,7 @@ class signalgenerator(geometry.base):
             if ((pixel / 50) % 2 == 1)
                 sourcex = 1 - sourcex;
                 
-            vec4 t = textureLod(tex, vec2(sourcex, 1 - sourcey), 3);
+            vec4 t = textureLod(tex, vec2(sourcex, sourcey), 3);
             
             int ledvalue = int(t.r * 255);
             ledvalue = ledvalue << 8;
@@ -52,18 +52,18 @@ class signalgenerator(geometry.base):
             ledvalue = ledvalue << 8;
             ledvalue |= int(t.b * 255);
             
-            int bitvalue = (ledvalue >> bit) & 1;
+            int bitvalue = (ledvalue >> (23 - bit)) & 1;
             
             float bitoffset = (v_texcoor.x * 12) - (bit % 12);
             
             float color;
             
             if(bitvalue == 0)
-                color = bitoffset < 0.2 ? 1 : 0;
+                color = bitoffset < 0.1 ? 1 : 0;
             else
-                color = bitoffset < 0.5 ? 1 : 0;
+                color = bitoffset < 0.48 ? 1 : 0;
 
-            f_color = vec4(color, color, color, 1);
+            f_color = vec4(color, color, color, 3);
             
         } """
         
@@ -72,7 +72,7 @@ class signalgenerator(geometry.base):
         
     def getVertices(self):
         verts = [(-1, -1), (+1, -1), (+1, +1), (-1, +1)]
-        coors = [(0, 0), (1, 0), (1, 1), (0, 1)]
+        coors = [(0, 1), (1, 1), (1, 0), (0, 0)]
         
         return { 'position' : verts, 'texcoor' : coors }
         

@@ -26,6 +26,7 @@ class video(geometry.simple.texquad):
         } """
         
     def __init__(self, filename):
+        self.filename = filename
         self.cap = cv2.VideoCapture(filename)
         
         self.w = self.cap.get(cv.CV_CAP_PROP_FRAME_WIDTH)
@@ -54,12 +55,16 @@ class video(geometry.simple.texquad):
     def render(self):
         if self.n == 0:
             ret, frame = self.cap.read()
+            if not ret:
+                self.cap = cv2.VideoCapture(self.filename)
+                ret, frame = self.cap.read()
+                
             gl.glBindTexture(gl.GL_TEXTURE_RECTANGLE, self.tex)
             gl.glTexImage2D(gl.GL_TEXTURE_RECTANGLE, 0, gl.GL_RGB, self.w, self.h, 0, gl.GL_BGR, gl.GL_UNSIGNED_BYTE, frame.tostring())
             self.n = 1
         else:
             self.n -= 1
         
-        
+
         super(video, self).render()
         
