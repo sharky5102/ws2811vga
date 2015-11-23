@@ -16,6 +16,8 @@ import fbo
 import geometry.simple
 import geometry.video
 import geometry.ws2811
+import geometry.plasma
+import geometry.fire
 
 preview = False
 raw = False
@@ -41,8 +43,10 @@ def render():
 #    circle.render()
     
     vid.render()
-
-
+    
+#    plasma.render()
+#    fire.render()
+    
 def display():
     global mainfbo
     global texquad
@@ -86,10 +90,12 @@ glut.glutDisplayFunc(display)
 glut.glutKeyboardFunc(keyboard)
 
 circle = geometry.simple.circle()
-vid = geometry.video.video('test2.mp4')
+vid = geometry.video.video('snow3.mp4')
+plasma = geometry.plasma.plasma()
+fire = geometry.fire.fire()
 
 M = np.eye(4, dtype=np.float32)
-transforms.scale(M, 2, 6, 1)
+transforms.scale(M, 1, 3, 1)
 transforms.translate(M, 0, -1, 0)
 vid.setModelView(M)
 

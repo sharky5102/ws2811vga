@@ -44,7 +44,7 @@ class signalgenerator(geometry.base):
             if ((pixel / 50) % 2 == 1)
                 sourcex = 1 - sourcex;
                 
-            vec4 t = textureLod(tex, vec2(sourcex, sourcey), 3);
+            vec4 t = textureLod(tex, vec2(sourcex, sourcey), 2);
             
             int ledvalue = int(t.r * 255);
             ledvalue = ledvalue << 8;
