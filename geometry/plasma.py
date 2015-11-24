@@ -8,7 +8,7 @@ class plasma(geometry.simple.texquad):
     fragment_code = """
         #version 150
 
-        uniform samplerRect tex;
+        uniform sampler2D tex;
         out vec4 f_color;
         in vec2 v_texcoor;
         
@@ -22,7 +22,7 @@ class plasma(geometry.simple.texquad):
             coor.x = (floor(v_texcoor.x/pixsize_x)+0.5)*pixsize_x;
             coor.y = (floor(v_texcoor.y/pixsize_y)+0.5)*pixsize_y;
 
-            f_color = texture(tex, coor);
+            f_color = texture(tex, v_texcoor) + vec4(0.1, 0.1, 0.1, 1);
         } """
         
     def __init__(self):
@@ -37,7 +37,7 @@ class plasma(geometry.simple.texquad):
 
     def getVertices(self):
         verts = [(-1, +1), (+1, +1), (+1, -1), (-1, -1)]
-        coors = [(0, 0), (self.w, 0), (self.w, self.h), (0, self.h)]
+        coors = [(0, 0), (1, 0), (1, 1), (0, 1)]
         
         return { 'position' : verts, 'texcoor' : coors }
 
@@ -45,12 +45,12 @@ class plasma(geometry.simple.texquad):
         loc = gl.glGetUniformLocation(self.program, "tex")
         gl.glUniform1i(loc, 0)
         gl.glActiveTexture(gl.GL_TEXTURE0)
-        gl.glBindTexture(gl.GL_TEXTURE_RECTANGLE, self.tex)
+        gl.glBindTexture(gl.GL_TEXTURE_2D, self.tex)
         
         geometry.base.draw(self)
         
     def render(self):
-        self.t += .5
+        self.t -= .01
         
         data = bytearray(struct.pack('BBB', 255, 255, 255) * 10 * self.w)
         
@@ -59,12 +59,14 @@ class plasma(geometry.simple.texquad):
                 r = math.sin(self.t * math.pi * 2 / 7 + x * math.pi * 2 / 63 + y * math.pi * 2 / 13) * 127 + 128
                 g = math.sin(self.t * math.pi * 2 / 5 + x * math.pi * 2 / 43 + y * math.pi * 2 / 11) * 127 + 128
                 b = math.sin(self.t * math.pi * 2 / 13 + x * math.pi * 2 / 51 +y * math.pi * 2 / 9) * 127 + 128
-                
+                g=0
                 data[y*self.w*3+x*3+0] = struct.pack('B', r)
                 data[y*self.w*3+x*3+1] = struct.pack('B', g)
                 data[y*self.w*3+x*3+2] = struct.pack('B', b)
 
-        gl.glBindTexture(gl.GL_TEXTURE_RECTANGLE, self.tex)
-        gl.glTexImage2D(gl.GL_TEXTURE_RECTANGLE, 0, gl.GL_RGB, self.w, self.h, 0, gl.GL_RGB, gl.GL_UNSIGNED_BYTE, str(data))
+        gl.glBindTexture(gl.GL_TEXTURE_2D, self.tex)
+        gl.glTexImage2D(gl.GL_TEXTURE_2D, 0, gl.GL_RGB, self.w, self.h, 0, gl.GL_RGB, gl.GL_UNSIGNED_BYTE, str(data))
+        gl.glTexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR)
+        gl.glTexParameteri(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR)
 
         super(plasma, self).render()

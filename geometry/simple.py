@@ -1,4 +1,4 @@
-import geometry
+﻿import geometry
 import math
 import OpenGL.GL as gl
 import numpy as np
@@ -86,4 +86,42 @@ class texquad(geometry.base):
 
     def setTexture(self, tex):
         self.tex = tex
+
+class copper(texquad):
+    tex = 0
+    fragment_code = """
+        #version 150
+
+        out vec4 f_color;
+        in vec2 v_texcoor;
+        uniform vec2 direction;
+        uniform vec4 color;
+
+        void main()
+        {
+            vec2 b = direction;
+            vec2 a = v_texcoor;
+
+            float c = (sin(dot(a,b) / dot(b,b)) + 1) / 2; 
+            f_color = vec4(color.rgb, c);
+        } """
+
+    def getVertices(self):
+        verts = [(-1, -1), (+1, -1), (+1, +1), (-1, +1)]
+        coors = [(-1, -1), (1, -1), (1, 1), (-1, 1)]
         
+        return { 'position' : verts, 'texcoor' : coors }
+
+    def draw(self):
+        loc = gl.glGetUniformLocation(self.program, "direction")
+        gl.glUniform2f(loc, self.direction[0], self.direction[1])
+        loc = gl.glGetUniformLocation(self.program, "color")
+        gl.glUniform4f(loc, self.color[0], self.color[1], self.color[2], 1)
+        
+        super(copper, self).draw()
+        
+    def setDirection(self, v):
+        self.direction = v
+
+    def setColor(self, color):
+        self.color = color
