@@ -20,16 +20,23 @@ import geometry.plasma
 import geometry.fire
 
 import assembly.copperbar
+import assembly.circles
 
 preview = True
 raw = False
 
 start = time.time()
+lastTime = 0
 
 def render():
-    global start, circle, vid
+    global start, lastTime, circle, vid
     
     t = time.time() - start
+
+    if int(lastTime*10) < int(t*10):
+        circles.addCircle()
+
+	lastTime = t
 
     gl.glClearColor(0, 0, 0, 0)    
     gl.glClear(gl.GL_COLOR_BUFFER_BIT)
@@ -52,6 +59,8 @@ def render():
 #    fire.render()
 
     copperbar.render(t)
+ #   circles.render(t)
+
     
 def display():
     global mainfbo
@@ -101,7 +110,7 @@ plasma = geometry.plasma.plasma()
 #fire = geometry.fire.fire()
 
 M = np.eye(4, dtype=np.float32)
-transforms.scale(M, 1, 3, 1)
+transforms.scale(M, 1, 5, 1)
 #transforms.translate(M, 0, -1, 0)
 #vid.setModelView(M)
 
@@ -111,6 +120,9 @@ texquad.setTexture(mainfbo.getTexture())
 
 copperbar = assembly.copperbar.copperbar()
 copperbar.setProjection(M)
+
+circles = assembly.circles.circles()
+circles.setProjection(M)
 
 signalgenerator = geometry.ws2811.signalgenerator()
 signalgenerator.setTexture(mainfbo.getTexture())

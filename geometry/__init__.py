@@ -1,4 +1,4 @@
-import numpy as np
+﻿import numpy as np
 import OpenGL.GL as gl
 import OpenGL.GLUT as glut
 import math
@@ -12,20 +12,22 @@ class base(object):
         #version 120
         uniform mat4 modelview;
         uniform mat4 projection;
+        uniform vec4 objcolor;
+
         attribute vec4 color;
         attribute vec2 position;
         varying vec4 v_color;
         void main()
         {
             gl_Position = projection * modelview * vec4(position,0,1);
-            v_color = color;
+            v_color =  objcolor * color;
         } """
 
     fragment_code = """
         varying vec4 v_color;
         void main()
         {
-            gl_FragColor = vec4(1,1,1,1) + v_color;
+            gl_FragColor = v_color;
         } """
 
     attributes = { 'color' : 4, 'position' : 2 }
@@ -37,6 +39,7 @@ class base(object):
         self.setModelView(identity);
         self.setProjection(identity);
         (self.vertexBuffer, self.vertices) = self.loadGeometry();
+        self.color = (1,1,1,1)
 
     def getVertices(self):
         """Override for useful geometry"""
@@ -128,6 +131,10 @@ class base(object):
         # Use correct projection
         loc = gl.glGetUniformLocation(self.program, "projection")
         gl.glUniformMatrix4fv(loc, 1, False, self.projection)
+
+        # Use correct color
+        loc = gl.glGetUniformLocation(self.program, "objcolor")
+        gl.glUniform4fv(loc, 1, self.color)
 
         for attrib in self.attributes:
             loc = gl.glGetAttribLocation(self.program, attrib)

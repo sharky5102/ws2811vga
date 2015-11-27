@@ -6,20 +6,26 @@ import ctypes
 
 class circle(geometry.base):
     segs = 16
+    def __init__(self):
+        self.color = (1,1,1,1)
+        super(circle, self).__init__()
     
     def getVertices(self):
         colors = []
         verts = []
 
         for i in range(0,self.segs):
-             colors.append((1,1,1,1))
-             colors.append((1,1,1,1))
-             colors.append((1,1,1,1))
-             verts.append((0,0))
-             verts.append((math.sin(math.pi*2*i/self.segs), math.cos(math.pi*2*i/self.segs)))
-             verts.append((math.sin(math.pi*2*(i+1)/self.segs), math.cos(math.pi*2*(i+1)/self.segs)))
+            colors.append(self.color)
+            colors.append(self.color)
+            colors.append(self.color)
+            verts.append((0,0))
+            verts.append((math.sin(math.pi*2*i/self.segs), math.cos(math.pi*2*i/self.segs)))
+            verts.append((math.sin(math.pi*2*(i+1)/self.segs), math.cos(math.pi*2*(i+1)/self.segs)))
 
         return { 'position' : verts, 'color' : colors }
+
+    def setColor(self, color):
+        self.color = color
 
 class texquad(geometry.base):
     vertex_code = """
@@ -63,7 +69,7 @@ class texquad(geometry.base):
             
             vec4 t = textureLod(tex, coor, 2);
             
-            f_color = t * p + t * p2 ;
+            f_color = (t * p + t * p2) / 2 ;
         } """
         
     attributes = { 'position' : 2, 'texcoor' : 2 }
