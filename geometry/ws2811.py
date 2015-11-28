@@ -44,7 +44,9 @@ class signalgenerator(geometry.base):
             if ((pixel / 50) % 2 == 1)
                 sourcex = 1 - sourcex;
                 
-            vec4 t = textureLod(tex, vec2(sourcex, sourcey), 2);
+            vec3 t = textureLod(tex, vec2(sourcex, sourcey), 3).rgb;
+            
+            t = pow(t, vec3(2.2));
             
             int ledvalue = int(t.r * 255);
             ledvalue = ledvalue << 8;
@@ -63,7 +65,7 @@ class signalgenerator(geometry.base):
             else
                 color = bitoffset < 0.48 ? 1 : 0;
 
-            f_color = vec4(color, color, color, 3);
+            f_color = vec4(color, color, color, 1);
             
         } """
         
