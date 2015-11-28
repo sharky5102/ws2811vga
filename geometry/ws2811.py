@@ -44,7 +44,7 @@ class signalgenerator(geometry.base):
             if ((pixel / 50) % 2 == 1)
                 sourcex = 1 - sourcex;
                 
-            vec3 t = textureLod(tex, vec2(sourcex, sourcey), 3).rgb;
+            vec3 t = textureLod(tex, vec2(sourcex, sourcey), 3.5).rgb;
             
             t = pow(t, vec3(2.2));
             

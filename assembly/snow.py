@@ -12,7 +12,7 @@ class snow(assembly.assembly):
             self.pos = pos
             self.size = size
             self.reltime = reltime
-            self.v = (0, -.15)
+            self.v = (0, -.3)
             self.geometry = geometry
             self.laststep = reltime
             self.phase = random.uniform(0, math.pi*2)
@@ -42,11 +42,11 @@ class snow(assembly.assembly):
         self.geometry = geometry.simple.circle()
 
     def addFlake(self):
-        colors = [(1,1,1,1), (1,1,1,1), (1,1,1,1), (1,1,1,1), (1,1,1,1), (1,.2,0,1)]
+        colors = [(1,1,1,1), (1,1,1,1), (1,1,1,1), (1,1,1,1), (1,1,1,1), (1,.5,0,1)]
         if not self.time:
             return
 
-        c = self.flake(self.geometry, (random.uniform(0,2)-1, .3), random.uniform(0, 0.05) + 0.02, self.time, random.choice(colors))
+        c = self.flake(self.geometry, (random.uniform(0,2)-1, .3), random.uniform(0, 0.02) + 0.01, self.time, random.choice(colors))
 
         self.flakes.append(c)
 
