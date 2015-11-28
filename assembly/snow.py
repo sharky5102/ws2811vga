@@ -12,7 +12,7 @@ class snow(assembly.assembly):
             self.pos = pos
             self.size = size
             self.reltime = reltime
-            self.v = (0, -.3)
+            self.v = (-.1, -1 / (size/0.01))
             self.geometry = geometry
             self.laststep = reltime
             self.phase = random.uniform(0, math.pi*2)
@@ -46,7 +46,7 @@ class snow(assembly.assembly):
         if not self.time:
             return
 
-        c = self.flake(self.geometry, (random.uniform(0,2)-1, .3), random.uniform(0, 0.02) + 0.01, self.time, random.choice(colors))
+        c = self.flake(self.geometry, (random.uniform(0,2)-1, .3), random.uniform(0, 0.03) + 0.02, self.time, random.choice(colors))
 
         self.flakes.append(c)
 
