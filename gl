@@ -21,6 +21,7 @@ import geometry.fire
 
 import assembly.copperbar
 import assembly.circles
+import assembly.snow
 
 preview = True
 raw = False
@@ -35,6 +36,7 @@ def render():
 
     if int(lastTime*10) < int(t*10):
         circles.addCircle()
+        snow.addFlake()
 
 	lastTime = t
 
@@ -58,8 +60,10 @@ def render():
 #    plasma.render()
 #    fire.render()
 
-    copperbar.render(t)
- #   circles.render(t)
+ #   copperbar.render(t)
+#    circles.render(t)
+    snow.render(t)
+    snow.step(t)
 
     
 def display():
@@ -123,6 +127,9 @@ copperbar.setProjection(M)
 
 circles = assembly.circles.circles()
 circles.setProjection(M)
+
+snow = assembly.snow.snow()
+snow.setProjection(M)
 
 signalgenerator = geometry.ws2811.signalgenerator()
 signalgenerator.setTexture(mainfbo.getTexture())
