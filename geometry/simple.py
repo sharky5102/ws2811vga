@@ -4,6 +4,8 @@ import OpenGL.GL as gl
 import numpy as np
 import ctypes
 
+from PIL import Image
+
 class circle(geometry.base):
     segs = 16
     def __init__(self):
@@ -92,6 +94,33 @@ class texquad(geometry.base):
 
     def setTexture(self, tex):
         self.tex = tex
+
+class imgquad(texquad):
+    fragment_code = """
+        #version 150
+
+        uniform sampler2D tex;
+        out vec4 f_color;
+        in vec2 v_texcoor;
+        
+        void main()
+        {
+            vec4 t = texture(tex, v_texcoor);
+            
+            f_color = t;
+        } """
+
+    def __init__(self, filename):
+        im = Image.open(filename)
+
+        imdata = np.fromstring(im.tostring(), np.uint8)
+        self.tex = gl.glGenTextures(1)
+        gl.glBindTexture(gl.GL_TEXTURE_2D, self.tex)
+        gl.glTexParameterf(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR)
+        gl.glTexParameterf(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR_MIPMAP_LINEAR)
+        gl.glTexImage2D(gl.GL_TEXTURE_2D, 0, gl.GL_RGB, im.size[0], im.size[1], 0, gl.GL_RGB, gl.GL_UNSIGNED_BYTE, imdata)
+
+        super(imgquad, self).__init__()
 
 class copper(texquad):
     tex = 0

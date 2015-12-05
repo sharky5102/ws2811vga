@@ -22,6 +22,7 @@ import geometry.fire
 import assembly.copperbar
 import assembly.circles
 import assembly.snow
+import assembly.sint
 
 preview = True
 raw = False
@@ -62,6 +63,8 @@ def render():
 
 #    copperbar.render(t)
 #    circles.render(t)
+
+    sint.render(t)
 
     snow.render(t)
     snow.step(t)
@@ -132,6 +135,9 @@ circles.setProjection(M)
 
 snow = assembly.snow.snow()
 snow.setProjection(M)
+
+sint = assembly.sint.sint()
+sint.setProjection(M)
 
 signalgenerator = geometry.ws2811.signalgenerator()
 signalgenerator.setTexture(mainfbo.getTexture())
