@@ -28,19 +28,23 @@ class video(geometry.simple.texquad):
     def __init__(self, filename):
         self.filename = filename
         self.cap = cv2.VideoCapture(filename)
+        self.fps = self.cap.get(cv.CV_CAP_PROP_FPS)
+        self.frame = 0
+        print '%d fps' % self.fps
         
         self.w = self.cap.get(cv.CV_CAP_PROP_FRAME_WIDTH)
         self.h = self.cap.get(cv.CV_CAP_PROP_FRAME_HEIGHT)
         
         self.tex = gl.glGenTextures(1)
         self.n = 0
+        self.lastttime = 0
         
         super(video, self).__init__()
         
 
     def getVertices(self):
         verts = [(-1, +1), (+1, +1), (+1, -1), (-1, -1)]
-        coors = [(0, 0), (self.w, 0), (self.w, self.h), (0, self.h)]
+        coors = [(self.w, 0), (0, 0), (0, self.h), (self.w, self.h)]
         
         return { 'position' : verts, 'texcoor' : coors }
 
@@ -52,19 +56,12 @@ class video(geometry.simple.texquad):
         
         geometry.base.draw(self)
         
-    def render(self):
-        if self.n == 0:
+    def render(self, t):
+        while self.frame / self.fps < t:
             ret, frame = self.cap.read()
-            if not ret:
-                self.cap = cv2.VideoCapture(self.filename)
-                ret, frame = self.cap.read()
                 
             gl.glBindTexture(gl.GL_TEXTURE_RECTANGLE, self.tex)
             gl.glTexImage2D(gl.GL_TEXTURE_RECTANGLE, 0, gl.GL_RGB, self.w, self.h, 0, gl.GL_BGR, gl.GL_UNSIGNED_BYTE, frame.tostring())
-            self.n = 2
-        else:
-            self.n -= 1
-        
+            self.frame += 1
 
         super(video, self).render()
-        

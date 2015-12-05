@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
-# Copyright (c) 2014, Nicolas P. Rougier. All rights reserved.
+# Copyright (c) 1014, Nicolas P. Rougier. All rights reserved.
 # Distributed under the terms of the new BSD License.
 # -----------------------------------------------------------------------------
 import sys
@@ -55,13 +55,14 @@ def render():
     circle.setProjection(projection)
 #    circle.render()
     
-#    vid.render()
+#    vid.render(t)
     
 #    plasma.render()
 #    fire.render()
 
- #   copperbar.render(t)
+#    copperbar.render(t)
 #    circles.render(t)
+
     snow.render(t)
     snow.step(t)
 
@@ -109,12 +110,13 @@ glut.glutDisplayFunc(display)
 glut.glutKeyboardFunc(keyboard)
 
 circle = geometry.simple.circle()
-vid = geometry.video.video('snow3.mp4')
+vid = geometry.video.video('masagin.mp4')
 plasma = geometry.plasma.plasma()
 #fire = geometry.fire.fire()
 
 M = np.eye(4, dtype=np.float32)
-transforms.scale(M, 1, 3, 1)
+
+transforms.scale(M, 1, 5, 1)
 #transforms.translate(M, 0, -1, 0)
 vid.setModelView(M)
 
