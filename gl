@@ -14,7 +14,7 @@ import transforms
 import time
 import fbo
 import geometry.simple
-import geometry.video
+#import geometry.video
 import geometry.ws2811
 import geometry.plasma
 import geometry.fire
@@ -23,7 +23,7 @@ import assembly.copperbar
 import assembly.circles
 import assembly.snow
 
-preview = False
+preview = True
 raw = False
 
 start = time.time()
@@ -34,7 +34,7 @@ def render():
     
     t = time.time() - start
 
-    if int(lastTime*10) < int(t*10):
+    if int(lastTime*50) < int(t*50):
         circles.addCircle()
         snow.addFlake()
 
@@ -110,7 +110,7 @@ glut.glutDisplayFunc(display)
 glut.glutKeyboardFunc(keyboard)
 
 circle = geometry.simple.circle()
-vid = geometry.video.video('masagin.mp4')
+#vid = geometry.video.video('masagin.mp4')
 plasma = geometry.plasma.plasma()
 #fire = geometry.fire.fire()
 
@@ -118,7 +118,7 @@ M = np.eye(4, dtype=np.float32)
 
 transforms.scale(M, 1, 5, 1)
 #transforms.translate(M, 0, -1, 0)
-vid.setModelView(M)
+#vid.setModelView(M)
 
 mainfbo = fbo.FBO(512, 128)
 texquad = geometry.simple.texquad()
