@@ -23,8 +23,9 @@ import assembly.copperbar
 import assembly.circles
 import assembly.snow
 import assembly.sint
+import assembly.matrix
 
-preview = False
+preview = True
 raw = False
 
 start = time.time()
@@ -38,6 +39,9 @@ def render():
     if int(lastTime*25) < int(t*25):
 #        circles.addCircle()
         snow.addFlake()
+
+    if int(lastTime*2) < int(t*2):
+        matrix.addbar(t)
 
 	lastTime = t
 
@@ -66,8 +70,10 @@ def render():
 
 #    sint.render(t)
 
-    snow.render(t)
-    snow.step(t)
+#    snow.render(t)
+#    snow.step(t)
+	
+    matrix.render(t)
 
     
 def display():
@@ -138,6 +144,9 @@ snow.setProjection(M)
 
 sint = assembly.sint.sint()
 sint.setProjection(M)
+
+matrix = assembly.matrix.matrix()
+matrix.setProjection(M)
 
 signalgenerator = geometry.ws2811.signalgenerator()
 signalgenerator.setTexture(mainfbo.getTexture())
