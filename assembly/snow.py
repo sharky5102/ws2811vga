@@ -56,7 +56,7 @@ class snow(assembly.assembly):
             c.setProjection(self.projection)
             c.render(t)
 
-        self.flakes = [circle for circle in self.flakes if t - circle.reltime < 5]
+        self.flakes = [circle for circle in self.flakes if circle.pos[1] > -.3]
 
     def setProjection(self, M):
         self.projection = M

@@ -24,7 +24,7 @@ import assembly.circles
 import assembly.snow
 import assembly.sint
 
-preview = True
+preview = False
 raw = False
 
 start = time.time()
@@ -35,8 +35,8 @@ def render():
     
     t = time.time() - start
 
-    if int(lastTime*50) < int(t*50):
-        circles.addCircle()
+    if int(lastTime*25) < int(t*25):
+#        circles.addCircle()
         snow.addFlake()
 
 	lastTime = t
@@ -46,14 +46,14 @@ def render():
     gl.glEnable(gl.GL_BLEND)
     gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE)
 
-    model = np.eye(4, dtype=np.float32)
-    transforms.translate(model, math.sin(0.5*t*math.pi*2) * 5, 0, 0)
+#    model = np.eye(4, dtype=np.float32)
+#    transforms.translate(model, math.sin(0.5*t*math.pi*2) * 5, 0, 0)
 
-    projection = np.eye(4, dtype=np.float32)
-    transforms.scale(projection, .2, 1, 1)
+#    projection = np.eye(4, dtype=np.float32)
+#    transforms.scale(projection, .2, 1, 1)
 
-    circle.setModelView(model)
-    circle.setProjection(projection)
+#    circle.setModelView(model)
+#    circle.setProjection(projection)
 #    circle.render()
     
 #    vid.render(t)
@@ -64,7 +64,7 @@ def render():
 #    copperbar.render(t)
 #    circles.render(t)
 
-    sint.render(t)
+#    sint.render(t)
 
     snow.render(t)
     snow.step(t)
