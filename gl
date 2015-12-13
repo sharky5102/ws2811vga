@@ -75,6 +75,7 @@ def render():
 	
     matrix.render(t)
 
+    print 'a'
     
 def display():
     global mainfbo

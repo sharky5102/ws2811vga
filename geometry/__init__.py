@@ -33,8 +33,12 @@ class base(object):
     attributes = { 'color' : 4, 'position' : 2 }
     primitive = gl.GL_TRIANGLES
 
+    program = None
+
     def __init__(self):
-        self.program = self.loadShaderProgram();
+        if not self.__class__.program:
+            self.__class__.program = self.loadShaderProgram();
+
         identity = np.eye(4, dtype=np.float32)
         self.setModelView(identity);
         self.setProjection(identity);
