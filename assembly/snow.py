@@ -42,7 +42,7 @@ class snow(assembly.assembly):
         self.geometry = geometry.simple.circle()
 
     def addFlake(self):
-        colors = [(1,1,1,.2), (1,1,1,.2), (1,1,1,.2), (1,1,1,.2), (1,1,1,.2), (1,.5,0,.2)]
+        colors = [(1,1,1,.4), (1,1,1,.4), (1,1,1,.4), (1,1,1,.4), (1,1,1,.4), (1,.5,0,.4)]
         if not self.time:
             return
 

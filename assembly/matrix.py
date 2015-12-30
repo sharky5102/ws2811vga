@@ -4,17 +4,24 @@ import geometry
 import OpenGL.GL as gl
 import numpy as np
 import transforms
+import math
 
 class matrix(assembly.assembly):
     class MatrixColumn(geometry.base):
         primitive = gl.GL_QUADS
 
         def __init__(self):
-            self.head = 0.2
+            self.head = 0.5
             self.tail = 0.2
-            self.headcolor = (.5, 1, .5, 1)
-            self.color = (0, .5, 0, 1)
-            self.tailcolor = (0, .5, 0, 0)
+
+#            maincolor = (.1, .5, .2)
+            maincolors = [(.1, .1, .6), (.0, .5, .0), (.8, .0, 0)]
+            maincolor = random.choice(maincolors)
+
+            self.headcolor = (1, 1, 1, 1)
+            self.color = maincolor + (.4,)
+            self.pretailcolor = maincolor + (.2,)
+            self.tailcolor = maincolor + (0,)
 
             super(matrix.MatrixColumn, self).__init__()
     
@@ -23,10 +30,10 @@ class matrix(assembly.assembly):
             colors = [self.headcolor, self.headcolor, self.color, self.color]
 
             verts += [(-1, -1+self.head), (+1, -1+self.head), (+1, +1-self.tail), (-1, +1-self.tail)]
-            colors += [self.color, self.color, self.color, self.color]
+            colors += [self.color, self.color, self.pretailcolor, self.pretailcolor]
 
             verts += [(-1, +1-self.tail), (+1, +1-self.tail), (+1, +1), (-1, +1)]
-            colors += [self.color, self.color, self.tailcolor, self.tailcolor]
+            colors += [self.pretailcolor, self.pretailcolor, self.tailcolor, self.tailcolor]
 
             return { 'position' : verts, 'color' : colors }
 
@@ -39,8 +46,8 @@ class matrix(assembly.assembly):
         def render(self, t):
             reltime = t - self.start
             M = np.eye(4, dtype=np.float32)
-            transforms.scale(M, 1.0/50, 0.4, 1)
-            transforms.translate(M, (self.slot+.5) * 2.0/50 - 1, (reltime / -10) +.6 , 0)
+            transforms.scale(M, 1.5/50, .4, 1)
+            transforms.translate(M, (self.slot+.5) * 2.0/50 - 1, (reltime / -5) +.6 , 0)
             self.bar.setModelView(M)
             self.bar.render()
 
@@ -60,7 +67,7 @@ class matrix(assembly.assembly):
         for slot, bar in self.slots.items():
             if bar == None:
                 slots.append(slot)
-            elif t - bar.start > 20:
+            elif t - bar.start > 10:
                 self.slots[slot] = None
 
         if len(slots) == 0:

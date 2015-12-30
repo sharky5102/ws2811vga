@@ -25,7 +25,7 @@ import assembly.snow
 import assembly.sint
 import assembly.matrix
 
-preview = True
+preview = False
 raw = False
 
 start = time.time()
@@ -40,7 +40,7 @@ def render():
 #        circles.addCircle()
         snow.addFlake()
 
-    if int(lastTime*2) < int(t*2):
+    if int(lastTime*4) < int(t*4):
         matrix.addbar(t)
 
 	lastTime = t
@@ -74,8 +74,6 @@ def render():
 #    snow.step(t)
 	
     matrix.render(t)
-
-    print 'a'
     
 def display():
     global mainfbo
