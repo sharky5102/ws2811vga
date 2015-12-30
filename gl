@@ -13,6 +13,7 @@ import math
 import transforms
 import time
 import fbo
+import random
 import geometry.simple
 #import geometry.video
 import geometry.ws2811
@@ -24,21 +25,31 @@ import assembly.circles
 import assembly.snow
 import assembly.sint
 import assembly.matrix
+import assembly.particles
 
-preview = False
+preview = True
 raw = False
 
 start = time.time()
 lastTime = 0
 
+ps = []
+
 def render():
-    global start, lastTime, circle, vid
+    global start, lastTime, circle, vid, ps
     
     t = time.time() - start
 
-    if int(lastTime*25) < int(t*25):
+    if int(lastTime/2) < int(t/2):
+		particles = assembly.particles.particles((random.uniform(-1, 1), .1), t)
+		particles.setProjection(M)
+		ps.append(particles)
 #        circles.addCircle()
-        snow.addFlake()
+#        snow.addFlake()
+
+		print len(ps)
+		if len(ps) >= 3:
+			ps = ps[1:]
 
     if int(lastTime*4) < int(t*4):
         matrix.addbar(t)
@@ -73,7 +84,9 @@ def render():
 #    snow.render(t)
 #    snow.step(t)
 	
-    matrix.render(t)
+#    matrix.render(t)
+    for particles in ps:
+        particles.render(t)
     
 def display():
     global mainfbo
@@ -146,6 +159,9 @@ sint.setProjection(M)
 
 matrix = assembly.matrix.matrix()
 matrix.setProjection(M)
+
+#particles = assembly.particles.particles()
+#particles.setProjection(M)
 
 signalgenerator = geometry.ws2811.signalgenerator()
 signalgenerator.setTexture(mainfbo.getTexture())

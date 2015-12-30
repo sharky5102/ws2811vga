@@ -122,6 +122,22 @@ class imgquad(texquad):
 
         super(imgquad, self).__init__()
 
+class spotquad(texquad):
+    tex = 0
+    fragment_code = """
+        #version 150
+
+        out vec4 f_color;
+        in vec2 v_texcoor;
+        
+        void main()
+        {
+            vec4 t = vec4(f_color.rgb, length(v_texcoor - vec2(0.5, 0.5)));
+            
+            t = vec4(1.0);
+            f_color = t;
+        } """
+
 class copper(texquad):
     tex = 0
     fragment_code = """
