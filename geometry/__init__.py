@@ -45,6 +45,9 @@ class base(object):
         (self.vertexBuffer, self.vertices) = self.loadGeometry();
         self.color = (1,1,1,1)
 
+    def __del__(self):
+        gl.glDeleteBuffers(1, [self.vertexBuffer])
+
     def getVertices(self):
         """Override for useful geometry"""
         return ([], [])

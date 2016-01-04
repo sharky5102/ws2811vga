@@ -27,7 +27,7 @@ import assembly.sint
 import assembly.matrix
 import assembly.particles
 
-preview = True
+preview = False
 raw = False
 
 start = time.time()
@@ -47,14 +47,13 @@ def render():
 #        circles.addCircle()
 #        snow.addFlake()
 
-		print len(ps)
 		if len(ps) >= 3:
 			ps = ps[1:]
 
-    if int(lastTime*4) < int(t*4):
-        matrix.addbar(t)
+#    if int(lastTime*4) < int(t*4):
+#        matrix.addbar(t)
 
-	lastTime = t
+    lastTime = t
 
     gl.glClearColor(0, 0, 0, 0)    
     gl.glClear(gl.GL_COLOR_BUFFER_BIT)
