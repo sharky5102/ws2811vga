@@ -26,8 +26,8 @@ class video(geometry.simple.texquad):
         } """
         
     def __init__(self):
-        self.filename = 'video.avi'
-        self.cap = cv2.VideoCapture(filename)
+        self.filename = 'video.mp4'
+        self.cap = cv2.VideoCapture(self.filename)
         self.fps = self.cap.get(cv.CV_CAP_PROP_FPS)
         self.frame = 0
         print '%d fps' % self.fps

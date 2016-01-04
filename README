@@ -1,0 +1,10 @@
+A ws2811 driver using VGA signals using OpenGL and Python.
+
+See
+https://stevehardyblog.wordpress.com/2016/01/02/ws2811-christmas-lighting-using-vga
+
+for details on how to use this code
+
+
+
+Should work on Linux and Windows using FreeGlut

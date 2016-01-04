@@ -69,7 +69,7 @@ class texquad(geometry.base):
             float p = 1-length(d)*20;
             float p2 = length(d) > 1.0 * pixsize_x ? 0.0 : 1.0;
             
-            vec4 t = textureLod(tex, coor, 2);
+            vec4 t = textureLod(tex, coor, 3);
             
             f_color = (t * p + t * p2) / 2 ;
         } """
