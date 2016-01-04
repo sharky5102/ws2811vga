@@ -41,7 +41,7 @@ class base(object):
         global cache
 
         # Cache the program based on the class name
-        if False and self.__class__.__name__ in cache:
+        if self.__class__.__name__ in cache:
             self.program = cache[self.__class__.__name__]
         else:
             self.program = self.loadShaderProgram()
