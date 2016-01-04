@@ -13,6 +13,6 @@ Should work on Linux and Windows using FreeGlut
 Example commandlines:
 
 ./xmas.py --preview --raw copperbar
-./xmas.py video
+DISPLAY=:0.1 ./xmas.py video
 ./xmas.py --preview matrix
 ./xmas.py --preview circles
