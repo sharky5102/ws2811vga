@@ -5,6 +5,8 @@ import math
 import transforms
 import ctypes
 
+cache = {}
+
 class base(object):
     """Base class for 2d geometries with modelview and projection transforms"""    
     
@@ -36,8 +38,14 @@ class base(object):
     program = None
 
     def __init__(self):
-        if not self.__class__.program:
-            self.__class__.program = self.loadShaderProgram();
+        global cache
+
+        # Cache the program based on the class name
+        if False and self.__class__.__name__ in cache:
+            self.program = cache[self.__class__.__name__]
+        else:
+            self.program = self.loadShaderProgram()
+            cache[self.__class__.__name__] = self.program
 
         identity = np.eye(4, dtype=np.float32)
         self.setModelView(identity);
