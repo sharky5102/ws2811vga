@@ -7,6 +7,8 @@ import math
 import colorsys
 
 class snow(assembly.assembly):
+    freq = 10
+
     class flake(object):
         def __init__(self, geometry, pos, size, reltime, color):
             self.pos = pos
@@ -40,6 +42,7 @@ class snow(assembly.assembly):
         self.flakes = []
         self.time = None
         self.geometry = geometry.simple.circle()
+        self.last = 0
 
     def addFlake(self):
         colors = [(1,1,1,.4), (1,1,1,.4), (1,1,1,.4), (1,1,1,.4), (1,1,1,.4), (1,.5,0,.4)]
@@ -51,6 +54,13 @@ class snow(assembly.assembly):
         self.flakes.append(c)
 
     def render(self, t):
+        if int(t*self.freq) > int(self.last*self.freq):
+            self.addFlake()
+
+        self.step(t)
+
+        self.last = t
+
         self.time = t
         for c in self.flakes:
             c.setProjection(self.projection)

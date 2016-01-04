@@ -7,6 +7,8 @@ import transforms
 import math
 
 class matrix(assembly.assembly):
+    freq = 4
+
     class MatrixColumn(geometry.base):
         primitive = gl.GL_QUADS
 
@@ -57,6 +59,7 @@ class matrix(assembly.assembly):
 
     def __init__(self):
         self.slots = {}
+        self.last = 0
 
         for i in range(0,50):
             self.slots[i] = None
@@ -78,6 +81,11 @@ class matrix(assembly.assembly):
         self.slots[random_slot] = self.MatrixBar(t, random_slot)
 
     def render(self, t):
+        if int(t*self.freq) > int(self.last*self.freq):
+            self.addbar(t)
+
+        self.last = t
+
         for slot, bar in self.slots.items():
             if not bar:
                 continue

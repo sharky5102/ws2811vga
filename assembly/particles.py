@@ -6,7 +6,31 @@ import numpy as np
 import transforms
 import math
 
-class particles(assembly.assembly):
+class particles():
+    freq = .5
+    maxparts = 3
+        
+    def __init__(self):
+        self.last = 0
+        self.ps = []
+
+    def setProjection(self, M):
+        self.projection = M
+
+    def render(self, t):
+        if int(t*self.freq) > int(self.last*self.freq):
+            p = particle((random.uniform(-1, 1), .1), t)
+            p.setProjection(self.projection)
+            self.ps.append(p)
+        self.last = t
+
+        if len(self.ps) >= self.maxparts:
+            self.ps = self.ps[1:]
+        
+        for p in self.ps:
+            p.render(t)
+
+class particle(assembly.assembly):
     class Particle:
         def __init__(self, pos, v, m):
             self.pos = pos

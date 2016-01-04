@@ -1,4 +1,4 @@
-import geometry
+﻿import geometry
 import geometry.simple
 import OpenGL.GL as gl
 import cv2
@@ -25,8 +25,8 @@ class video(geometry.simple.texquad):
             f_color = texture(tex, coor);
         } """
         
-    def __init__(self, filename):
-        self.filename = filename
+    def __init__(self):
+        self.filename = 'video.avi'
         self.cap = cv2.VideoCapture(filename)
         self.fps = self.cap.get(cv.CV_CAP_PROP_FPS)
         self.frame = 0

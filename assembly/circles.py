@@ -1,4 +1,4 @@
-import assembly
+﻿import assembly
 import geometry.simple
 import numpy as np
 import transforms
@@ -7,6 +7,7 @@ import math
 import colorsys
 
 class circles(assembly.assembly):
+    freq = 4    
     class circle(object):
         def __init__(self, pos, reltime, color):
             self.pos = pos
@@ -35,6 +36,7 @@ class circles(assembly.assembly):
     def __init__(self):
         self.circles = []
         self.time = None
+        self.last = 0
         ncolors = 2
         basehue = random.uniform(0, 1)
 
@@ -47,6 +49,11 @@ class circles(assembly.assembly):
         self.circles.append(c)
 
     def render(self, t):
+        if int(t*self.freq) > int(self.last*self.freq):
+            self.addCircle()
+
+        self.last = t
+
         self.time = t
         for c in self.circles:
             c.setProjection(self.projection)
