@@ -42,7 +42,7 @@ class particle(assembly.assembly):
                 
         def step(self, dt):
             self.pos = (self.pos[0] + self.v[0] * dt, self.pos[1] + self.v[1] * dt)
-            self.v = (self.v[0] * math.pow(0.1 * self.m, dt), self.v[1] * math.pow(0.1 * self.m, dt) - 0.005)
+            self.v = (self.v[0] * math.pow(0.1 * self.m, dt * 2), self.v[1] * math.pow(0.1 * self.m, dt * 2) - 0.002)
 
         def render(self, t):
             M = np.eye(4, dtype=np.float32)
@@ -52,9 +52,9 @@ class particle(assembly.assembly):
             if t > self.flicker:
                 dt = t - self.flicker
 
-                a = max(0, .5 - (dt/4))
+                a = max(0, .5 - math.pow(dt/4, 2))
 
-                n = math.sin(dt*20)/2 + 0.5
+                n = math.sin(dt*30)/2 + 0.5
                 self.part.setColor((1,.5 + n * .5, n, a))
 
             self.part.setModelView(M)
@@ -71,7 +71,7 @@ class particle(assembly.assembly):
         for i in range(0, 50):
             pos = (spos[0] + random.uniform(-.01, .01), spos[1] + random.uniform(-.01, .01))
             a = random.uniform(0, 2 * math.pi)
-            v = (0.5 * math.sin(a) * random.uniform(1.0, 1.5), 0.5 * math.cos(a) * random.uniform(1.0, 1.5))
+            v = (1.0 * math.sin(a) * random.uniform(1.0, 1.5), 1.0 * math.cos(a) * random.uniform(1.0, 1.5))
             m = random.uniform(0.8, 1.2)
             self.particles.append(self.Particle(pos, v, m))
 

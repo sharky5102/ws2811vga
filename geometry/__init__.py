@@ -73,10 +73,10 @@ class base(object):
         # Compile shaders
         gl.glCompileShader(vertex)
         gl.glCompileShader(fragment)
-        print 'Vertex shader'
-        print gl.glGetShaderInfoLog(vertex)
-        print 'Fragment shader'
-        print gl.glGetShaderInfoLog(fragment)
+        print('Vertex shader')
+        print(gl.glGetShaderInfoLog(vertex))
+        print('Fragment shader')
+        print(gl.glGetShaderInfoLog(fragment))
 
         # Attach shader objects to the program
         gl.glAttachShader(program, vertex)

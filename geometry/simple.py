@@ -66,12 +66,12 @@ class texquad(geometry.base):
             vec2 d = v_texcoor - coor;
             d.x *= 5;
             
-            float p = 1-length(d)*20;
+            float p = pow(1-length(d)*6, 3);
             float p2 = length(d) > 1.0 * pixsize_x ? 0.0 : 1.0;
             
             vec4 t = textureLod(tex, coor, 3);
             
-            f_color = (t * p + t * p2) / 2 ;
+            f_color = (t * p + t * p2);
         } """
         
     attributes = { 'position' : 2, 'texcoor' : 2 }
@@ -158,7 +158,7 @@ class copper(texquad):
         } """
 
     def getVertices(self):
-        verts = [(-1, -1), (+1, -1), (+1, +1), (-1, +1)]
+        verts = [(-1, -1), (1, -1), (1, 1), (-1, 1)]
         coors = [(-1, -1), (1, -1), (1, 1), (-1, 1)]
         
         return { 'position' : verts, 'texcoor' : coors }

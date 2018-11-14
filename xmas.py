@@ -19,7 +19,7 @@ import argparse
 import assembly.copperbar
 import assembly.circles
 import assembly.snow
-import assembly.sint
+#import assembly.sint
 import assembly.matrix
 import assembly.particles
 
@@ -83,7 +83,7 @@ args = parser.parse_args()
 
 glut.glutInit()
 glut.glutInitDisplayMode(glut.GLUT_DOUBLE | glut.GLUT_RGBA)
-glut.glutCreateWindow('Amazing ws2811 VGA renderer')
+glut.glutCreateWindow(b'Amazing ws2811 VGA renderer')
 if args.preview or args.raw:
     glut.glutReshapeWindow(1500,300)
 else:
@@ -115,7 +115,7 @@ try:
     effect = getattr(getattr(i, args.effect), args.effect)()
     effect.setProjection(M)
 except ImportError:
-    print 'Unable to initialize effect %s' % args.effect
+    print('Unable to initialize effect %s' % args.effect)
     raise
 
 if not args.raw and not args.preview:
