@@ -73,10 +73,10 @@ class base(object):
         # Compile shaders
         gl.glCompileShader(vertex)
         gl.glCompileShader(fragment)
-        print 'Vertex shader'
-        print gl.glGetShaderInfoLog(vertex)
-        print 'Fragment shader'
-        print gl.glGetShaderInfoLog(fragment)
+        print('Vertex shader')
+        print(gl.glGetShaderInfoLog(vertex))
+        print('Fragment shader')
+        print(gl.glGetShaderInfoLog(fragment))
 
         # Attach shader objects to the program
         gl.glAttachShader(program, vertex)
@@ -153,6 +153,8 @@ class base(object):
 
         for attrib in self.attributes:
             loc = gl.glGetAttribLocation(self.program, attrib)
+            if loc < 0:
+                raise RuntimeError('Attribute %s not found in program' % attrib)
             gl.glEnableVertexAttribArray(loc)
             gl.glBindBuffer(gl.GL_ARRAY_BUFFER, self.vertexBuffer)
             gl.glVertexAttribPointer(loc, self.attributes[attrib], gl.GL_FLOAT, False, self.stride, self.offsets[attrib])

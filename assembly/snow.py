@@ -7,7 +7,7 @@ import math
 import colorsys
 
 class snow(assembly.assembly):
-    freq = 10
+    freq = 30
 
     class flake(object):
         def __init__(self, geometry, pos, size, reltime, color):

@@ -2,13 +2,12 @@
 import geometry.simple
 import OpenGL.GL as gl
 import cv2
-import cv2.cv as cv
 
 class video(geometry.simple.texquad):
     fragment_code = """
         #version 150
 
-        uniform samplerRect tex;
+        uniform sampler2DRect tex;
         out vec4 f_color;
         in vec2 v_texcoor;
         
@@ -26,14 +25,14 @@ class video(geometry.simple.texquad):
         } """
         
     def __init__(self):
-        self.filename = 'video.mp4'
+        self.filename = 'masagin.mp4'
         self.cap = cv2.VideoCapture(self.filename)
-        self.fps = self.cap.get(cv.CV_CAP_PROP_FPS)
+        self.fps = self.cap.get(cv2.CAP_PROP_FPS)
         self.frame = 0
-        print '%d fps' % self.fps
+        print('%d fps' % self.fps)
         
-        self.w = self.cap.get(cv.CV_CAP_PROP_FRAME_WIDTH)
-        self.h = self.cap.get(cv.CV_CAP_PROP_FRAME_HEIGHT)
+        self.w = self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+        self.h = self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
         
         self.tex = gl.glGenTextures(1)
         self.n = 0
@@ -43,7 +42,8 @@ class video(geometry.simple.texquad):
         
 
     def getVertices(self):
-        verts = [(-1, +1), (+1, +1), (+1, -1), (-1, -1)]
+        aspect = float(self.w)/float(self.h)
+        verts = [(-aspect, +1), (+aspect, +1), (+aspect, -1), (-aspect, -1)]
         coors = [(self.w, 0), (0, 0), (0, self.h), (self.w, self.h)]
         
         return { 'position' : verts, 'texcoor' : coors }

@@ -45,7 +45,7 @@ class circles(assembly.assembly):
     def addCircle(self):
         if not self.time:
             return
-        c = self.circle((random.uniform(-1, 1), random.uniform(0, 0.4)-0.2), self.time, random.choice(self.colors))
+        c = self.circle((random.uniform(-1, 1), random.uniform(-1, 1)), self.time, random.choice(self.colors))
         self.circles.append(c)
 
     def render(self, t):
