@@ -29,7 +29,71 @@ class circle(geometry.base):
     def setColor(self, color):
         self.color = color
 
+class square(geometry.base):
+    def __init__(self):
+        self.color = (1,1,1,1)
+        super(square, self).__init__()
+    
+    def getVertices(self):
+        verts = [ (0,0), (0,1), (1,1),   (0,0), (1,0), (1,1) ]
+        
+        return { 'position' : verts, 'color' : [self.color] * 6 }
+
+    def setColor(self, color):
+        self.color = color
+
+
 class texquad(geometry.base):
+    vertex_code = """
+        #version 150
+        uniform mat4 modelview;
+        uniform mat4 projection;
+        
+        in vec2 position;
+        in vec2 texcoor;
+
+        out vec2 v_texcoor;
+        
+        void main()
+        {
+            gl_Position = projection * modelview * vec4(position,0,1);
+            v_texcoor = texcoor;
+        } """
+
+    fragment_code = """
+        #version 150
+
+        uniform sampler2D tex;
+        out vec4 f_color;
+        in vec2 v_texcoor;
+        
+        void main()
+        {
+            f_color = textureLod(tex, v_texcoor, 0);
+        } """
+        
+    attributes = { 'position' : 2, 'texcoor' : 2 }
+    primitive = gl.GL_QUADS
+        
+    def getVertices(self):
+        verts = [(-1, -1), (+1, -1), (+1, +1), (-1, +1)]
+        coors = [(0, 0), (1, 0), (1, 1), (0, 1)]
+        
+        return { 'position' : verts, 'texcoor' : coors }
+        
+    def draw(self):
+        loc = gl.glGetUniformLocation(self.program, "tex")
+        gl.glUniform1i(loc, 0)
+        gl.glActiveTexture(gl.GL_TEXTURE0)
+        gl.glBindTexture(gl.GL_TEXTURE_2D, self.tex)
+        gl.glGenerateMipmap(gl.GL_TEXTURE_2D)
+        
+        super(texquad, self).draw()
+
+    def setTexture(self, tex):
+        self.tex = tex
+
+class ballquad(geometry.base):
     vertex_code = """
         #version 150
         uniform mat4 modelview;

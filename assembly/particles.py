@@ -19,7 +19,7 @@ class particles():
 
     def render(self, t):
         if int(t*self.freq) > int(self.last*self.freq):
-            p = particle((random.uniform(-1, 1), .1), t)
+            p = particle((random.uniform(-1, 1), random.uniform(-1, 1)), t)
             p.setProjection(self.projection)
             self.ps.append(p)
         self.last = t
