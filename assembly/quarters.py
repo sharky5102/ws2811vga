@@ -19,7 +19,7 @@ class quarters():
 
         M = np.eye(4, dtype=np.float32)
         transforms.translate(M, 0.0, -1, 0)
-        transforms.rotate(M, t*90, 0, 0, 1)
+#        transforms.rotate(M, t*90, 0, 0, 1)
 		
         self.square.setModelView(M)
         self.square.setColor((1,1,1,1))
@@ -27,7 +27,7 @@ class quarters():
         
         M = np.eye(4, dtype=np.float32)
         transforms.translate(M, -1, -1, 0)
-        transforms.rotate(M, t*90, 0, 0, 1)
+#        transforms.rotate(M, t*90, 0, 0, 1)
 		
         self.square.setModelView(M)
         self.square.setColor((1,0,0,1))
@@ -35,14 +35,14 @@ class quarters():
 
         M = np.eye(4, dtype=np.float32)
         transforms.translate(M, -1, 0, 0)
-        transforms.rotate(M, t*90, 0, 0, 1)
+#        transforms.rotate(M, t*90, 0, 0, 1)
 		
         self.square.setModelView(M)
         self.square.setColor((0,1,0,1))
         self.square.render()
         M = np.eye(4, dtype=np.float32)
         transforms.translate(M, 0.0, 0, 0)
-        transforms.rotate(M, t*90, 0, 0, 1)
+#        transforms.rotate(M, t*90, 0, 0, 1)
 		
         self.square.setModelView(M)
         self.square.setColor((0,0,1,1))

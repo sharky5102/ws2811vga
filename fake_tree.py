@@ -26,5 +26,5 @@ for i in range(0, n):
 		a = 0
 		layer += 1
 	
-print(json.dumps(points))
+print(json.dumps([x for x in reversed(points)]))
 	
