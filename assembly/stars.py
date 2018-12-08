@@ -64,7 +64,6 @@ class stars(assembly.assembly):
 
         self.last = t
 
-        print len(self.stars)
         for star in self.stars:
             star.setProjection(self.projection)
             star.render(t)
