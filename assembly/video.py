@@ -25,7 +25,7 @@ class video(geometry.simple.texquad):
         } """
         
     def __init__(self):
-        self.filename = 'masagin.mp4'
+        self.filename = 'frozen.mp4'
         self.cap = cv2.VideoCapture(self.filename)
         self.fps = self.cap.get(cv2.CAP_PROP_FPS)
         self.frame = 0

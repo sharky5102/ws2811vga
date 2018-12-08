@@ -63,10 +63,13 @@ class stars(assembly.assembly):
         x = int(random.uniform(-25, 25))
         y = int(random.uniform(-5, 5))
         
-        mx = math.sin(0.11 * t * 2 * math.pi) * 15 + math.sin(0.13 * t * 2 * math.pi) * 10
-        my = math.sin(0.07 * t * 2 * math.pi) * 3
+        a = math.sin(0.11 * t * 2 * math.pi) * .3 * math.pi + math.sin(0.13 * t * 2 * math.pi) * .5 * math.pi
+        l = math.sin(0.07 * t * 2 * math.pi) * 12
 
-        w = 2 - 2*abs(math.cos(0.11 * t * 2 * math.pi) * 0.6 + math.cos(0.13 * t * 2 * math.pi) * 0.3)
+        mx = math.sin(a) * l
+        my = math.cos(a) * l
+
+        w = (3 - 2*abs(math.cos(0.11 * t * 2 * math.pi) * 0.6 + math.cos(0.13 * t * 2 * math.pi) * 0.3))
 
         x = mx + int(w*random.gauss(1, 1))
         y = my + int(w*random.gauss(1, 1))
