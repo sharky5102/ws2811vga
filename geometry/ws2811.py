@@ -41,9 +41,8 @@ class signalgenerator(geometry.base):
             int bit = int(v_texcoor.x * 12); // 12 bits per scanline
             bit += int(subpixel * 12); // second scanline
             
-            vec2 lamppos = texture(lamptex, pixel/512.0).xy * vec2(0.5,0.5) + vec2(.5,.5) ;
-                
-            vec3 t = textureLod(tex, lamppos, 3).rgb;
+            vec2 lamppos = texelFetch(lamptex, pixel, 0).xy * vec2(0.5,0.5) + vec2(.5,.5);
+            vec3 t = textureLod(tex, lamppos * vec2(1,-1), 3).rgb;
 			
             t = pow(t, vec3(2.2));
             

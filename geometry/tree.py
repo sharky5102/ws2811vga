@@ -39,8 +39,10 @@ class tree(geometry.base):
         
         void main()
         {
-            vec2 lamppos = texture(lamptex, v_id/512).xy * vec2(0.5,0.5) + vec2(.5,.5) ;
-            f_color = vec4(textureLod(tex, lamppos * vec2(1,-1), 0).rgb, 1);
+            vec2 lamppos = texelFetch(lamptex, int(v_id), 0).xy * vec2(0.5,0.5) + vec2(.5,.5) ;
+            vec3 t = textureLod(tex, lamppos * vec2(1,-1), 3).rgb;
+			
+            f_color = vec4(t, 1);
         } """
         
     attributes = { 'position' : 3, 'id' : 1 }
