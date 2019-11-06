@@ -7,8 +7,6 @@ import random
 
 class fire(geometry.simple.texquad):
     fragment_code = """
-        #version 150
-
         uniform samplerRect tex;
         out vec4 f_color;
         in vec2 v_texcoor;

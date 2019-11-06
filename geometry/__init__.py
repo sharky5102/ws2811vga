@@ -1,6 +1,5 @@
 ﻿import numpy as np
 import OpenGL.GL as gl
-import OpenGL.GLUT as glut
 import math
 import transforms
 import ctypes
@@ -10,26 +9,29 @@ cache = {}
 class base(object):
     """Base class for 2d geometries with modelview and projection transforms"""    
     
+    version = """#version 300 es\n"""
+    
     vertex_code = """
-        #version 120
         uniform mat4 modelview;
         uniform mat4 projection;
         uniform vec4 objcolor;
 
-        attribute vec4 color;
-        attribute vec2 position;
-        varying vec4 v_color;
+        in highp vec4 color;
+        in highp vec2 position;
+        out highp vec4 v_color;
         void main()
         {
-            gl_Position = projection * modelview * vec4(position,0,1);
+            gl_Position = projection * modelview * vec4(position,0.0,1.0);
             v_color =  objcolor * color;
         } """
 
     fragment_code = """
-        varying vec4 v_color;
+        in highp vec4 v_color;
+        out highp vec4 f_color;
+
         void main()
         {
-            gl_FragColor = v_color;
+            f_color = v_color;
         } """
 
     attributes = { 'color' : 4, 'position' : 2 }
@@ -67,16 +69,24 @@ class base(object):
         fragment = gl.glCreateShader(gl.GL_FRAGMENT_SHADER)
 
         # Set shaders source
-        gl.glShaderSource(vertex, self.vertex_code)
-        gl.glShaderSource(fragment, self.fragment_code)
+        gl.glShaderSource(vertex, self.version + self.vertex_code)
+        gl.glShaderSource(fragment, self.version + self.fragment_code)
 
         # Compile shaders
         gl.glCompileShader(vertex)
         gl.glCompileShader(fragment)
-        print('Vertex shader')
-        print(gl.glGetShaderInfoLog(vertex))
-        print('Fragment shader')
-        print(gl.glGetShaderInfoLog(fragment))
+        log = gl.glGetShaderInfoLog(vertex)
+        if log:
+            print('Vertex shader')
+            print(self.vertex_code)
+            print(log.decode('ascii'))
+            raise RuntimeError('Shader compiliation failed')
+        log = gl.glGetShaderInfoLog(fragment)
+        if log:
+            print('Fragment shader')
+            print(self.fragment_code)
+            print(log.decode('ascii'))
+            raise RuntimeError('Shader compiliation failed')
 
         # Attach shader objects to the program
         gl.glAttachShader(program, vertex)

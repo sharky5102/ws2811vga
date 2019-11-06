@@ -21,10 +21,10 @@ class tree():
         gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
 
         M = np.eye(4, dtype=np.float32)
-        #transforms.rotate(M, t*4, 0, 0, 1)
-        #transforms.rotate(M, 80, 1, 0, 0)
-        #transforms.scale(M, .5, -1, .5)
-        #transforms.translate(M, 0, -.5, -8)
+        transforms.rotate(M, t*4, 0, 0, 1)
+        transforms.rotate(M, 80, 1, 0, 0)
+        transforms.scale(M, .5, -1, .5)
+        transforms.translate(M, 0, -.5, -8)
 
         transforms.rotate(M, 00, 1, 0, 0)
         transforms.scale(M, .5, -.5, .5)

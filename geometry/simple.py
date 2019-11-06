@@ -45,31 +45,28 @@ class square(geometry.base):
 
 class texquad(geometry.base):
     vertex_code = """
-        #version 150
         uniform mat4 modelview;
         uniform mat4 projection;
         
-        in vec2 position;
-        in vec2 texcoor;
+        in highp vec2 position;
+        in highp vec2 texcoor;
 
-        out vec2 v_texcoor;
+        out highp vec2 v_texcoor;
         
         void main()
         {
-            gl_Position = projection * modelview * vec4(position,0,1);
+            gl_Position = projection * modelview * vec4(position,0.0,1.0);
             v_texcoor = texcoor;
         } """
 
     fragment_code = """
-        #version 150
-
         uniform sampler2D tex;
-        out vec4 f_color;
-        in vec2 v_texcoor;
+        out highp vec4 f_color;
+        in highp vec2 v_texcoor;
         
         void main()
         {
-            f_color = textureLod(tex, v_texcoor, 0);
+            f_color = textureLod(tex, v_texcoor, 0.0);
         } """
         
     attributes = { 'position' : 2, 'texcoor' : 2 }
@@ -86,7 +83,7 @@ class texquad(geometry.base):
         gl.glUniform1i(loc, 0)
         gl.glActiveTexture(gl.GL_TEXTURE0)
         gl.glBindTexture(gl.GL_TEXTURE_2D, self.tex)
-        gl.glGenerateMipmap(gl.GL_TEXTURE_2D)
+#        gl.glGenerateMipmap(gl.GL_TEXTURE_2D)
         
         super(texquad, self).draw()
 
@@ -95,7 +92,6 @@ class texquad(geometry.base):
 
 class ballquad(geometry.base):
     vertex_code = """
-        #version 150
         uniform mat4 modelview;
         uniform mat4 projection;
         
@@ -111,8 +107,6 @@ class ballquad(geometry.base):
         } """
 
     fragment_code = """
-        #version 150
-
         uniform sampler2D tex;
         out vec4 f_color;
         in vec2 v_texcoor;
@@ -152,7 +146,7 @@ class ballquad(geometry.base):
         gl.glUniform1i(loc, 0)
         gl.glActiveTexture(gl.GL_TEXTURE0)
         gl.glBindTexture(gl.GL_TEXTURE_2D, self.tex)
-        gl.glGenerateMipmap(gl.GL_TEXTURE_2D)
+#        gl.glGenerateMipmap(gl.GL_TEXTURE_2D)
         
         super(texquad, self).draw()
 
@@ -161,8 +155,6 @@ class ballquad(geometry.base):
 
 class imgquad(texquad):
     fragment_code = """
-        #version 150
-
         uniform sampler2D tex;
         out vec4 f_color;
         in vec2 v_texcoor;
@@ -189,10 +181,8 @@ class imgquad(texquad):
 class spotquad(texquad):
     tex = 0
     fragment_code = """
-        #version 150
-
-        out vec4 f_color;
-        in vec2 v_texcoor;
+        out highp vec4 f_color;
+        in highp vec2 v_texcoor;
         
         void main()
         {
@@ -205,19 +195,17 @@ class spotquad(texquad):
 class copper(texquad):
     tex = 0
     fragment_code = """
-        #version 150
-
-        out vec4 f_color;
-        in vec2 v_texcoor;
-        uniform vec2 direction;
-        uniform vec4 color;
+        out highp vec4 f_color;
+        in highp vec2 v_texcoor;
+        uniform highp vec2 direction;
+        uniform highp vec4 color;
 
         void main()
         {
-            vec2 b = direction;
-            vec2 a = v_texcoor;
+            highp vec2 b = direction;
+            highp vec2 a = v_texcoor;
 
-            float c = (sin(dot(a,b) / dot(b,b)) + 1) / 2; 
+            highp float c = (sin(dot(a,b) / dot(b,b)) + 1.0) / 2.0; 
             f_color = vec4(color.rgb, c);
         } """
 

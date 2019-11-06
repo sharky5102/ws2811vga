@@ -7,7 +7,6 @@ import json
 
 class signalgenerator(geometry.base):
     vertex_code = """
-        #version 150
         uniform mat4 modelview;
         uniform mat4 projection;
         
@@ -23,45 +22,43 @@ class signalgenerator(geometry.base):
         } """
 
     fragment_code = """
-        #version 150
-
         uniform sampler2D tex;
-        uniform sampler1D lamptex;
+        uniform sampler2D lamptex;
 		
-        out vec4 f_color;
-        in vec2 v_texcoor;
-        in float v_id;
+        out highp vec4 f_color;
+        in highp vec2 v_texcoor;
+        in highp float v_id;
         
         void main()
         {
-            int y = int(v_texcoor.y * 1000);
+            int y = int(v_texcoor.y * 1000.0);
             int pixel = y / 2;
             int subpixel = y % 2;
             
-            int bit = int(v_texcoor.x * 12); // 12 bits per scanline
+            int bit = int(v_texcoor.x * 12.0); // 12 bits per scanline
             bit += int(subpixel * 12); // second scanline
             
-            vec2 lamppos = texelFetch(lamptex, pixel, 0).xy * vec2(0.5,0.5) + vec2(.5,.5);
-            vec3 t = textureLod(tex, lamppos * vec2(1,-1), 3).rgb;
+            highp vec2 lamppos = texelFetch(lamptex, ivec2(pixel, 0), 0).xy * vec2(0.5,0.5) + vec2(.5,.5);
+            highp vec3 t = textureLod(tex, lamppos * vec2(1.0, -1.0), 3.0).rgb;
 			
             t = pow(t, vec3(2.2));
             
-            int ledvalue = int(t.r * 255);
+            int ledvalue = int(t.r * 255.0);
             ledvalue = ledvalue << 8;
-            ledvalue |= int(t.g * 255);
+            ledvalue |= int(t.g * 255.0);
             ledvalue = ledvalue << 8;
-            ledvalue |= int(t.b * 255);
+            ledvalue |= int(t.b * 255.0);
             
             int bitvalue = (ledvalue >> (23 - bit)) & 1;
             
-            float bitoffset = (v_texcoor.x * 12) - (bit % 12);
+            highp float bitoffset = (v_texcoor.x * 12.0) - float(bit % 12);
             
-            float color;
+            highp float color;
             
             if(bitvalue == 0)
-                color = bitoffset < 0.1 ? 1 : 0;
+                color = bitoffset < 0.1 ? 1.0 : 0.0;
             else
-                color = bitoffset < 0.48 ? 1 : 0;
+                color = bitoffset < 0.48 ? 1.0 : 0.0;
 
             f_color = vec4(color, color, color, 1);
             
@@ -88,10 +85,10 @@ class signalgenerator(geometry.base):
             data[i][2] = lamp[2];
         
         self.lamptex = gl.glGenTextures(1)
-        gl.glBindTexture(gl.GL_TEXTURE_1D, self.lamptex)
-        gl.glTexParameterf(gl.GL_TEXTURE_1D, gl.GL_TEXTURE_MAG_FILTER, gl.GL_NEAREST)
-        gl.glTexParameterf(gl.GL_TEXTURE_1D, gl.GL_TEXTURE_MIN_FILTER, gl.GL_NEAREST)
-        gl.glTexImage1D(gl.GL_TEXTURE_1D, 0, gl.GL_RGB16F, self.mapwidth, 0, gl.GL_RGB, gl.GL_FLOAT, data)
+        gl.glBindTexture(gl.GL_TEXTURE_2D, self.lamptex)
+        gl.glTexParameterf(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MAG_FILTER, gl.GL_NEAREST)
+        gl.glTexParameterf(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MIN_FILTER, gl.GL_NEAREST)
+        gl.glTexImage2D(gl.GL_TEXTURE_2D, 0, gl.GL_RGB16F, self.mapwidth, 1, 0, gl.GL_RGB, gl.GL_FLOAT, data)
 
         super(signalgenerator, self).__init__()
 
@@ -111,7 +108,7 @@ class signalgenerator(geometry.base):
         loc = gl.glGetUniformLocation(self.program, "lamptex")
         gl.glUniform1i(loc, 1)
         gl.glActiveTexture(gl.GL_TEXTURE1)
-        gl.glBindTexture(gl.GL_TEXTURE_1D, self.lamptex)
+        gl.glBindTexture(gl.GL_TEXTURE_2D, self.lamptex)
 		
         super(signalgenerator, self).draw()
 

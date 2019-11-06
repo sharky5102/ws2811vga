@@ -10,39 +10,35 @@ class tree(geometry.base):
     lampsize = 1/50
 
     vertex_code = """
-        #version 150
         uniform mat4 modelview;
         uniform mat4 projection;
         
-        in vec3 position;
-        in float id;
+        in highp vec3 position;
+        in highp float id;
 
-        out vec2 v_texcoor;
-        out float v_id;
+        out highp vec2 v_texcoor;
+        out highp float v_id;
         
         void main()
         {
-            gl_Position = projection * modelview * vec4(position,1);
-            v_texcoor = position.xy / 4 + 0.5;
+            gl_Position = projection * modelview * vec4(position,1.0);
+            v_texcoor = position.xy / 4.0 + 0.5;
             v_id = id;
         } """
 
     fragment_code = """
-        #version 150
-
         uniform sampler2D tex;
-        uniform sampler1D lamptex;
-        out vec4 f_color;
-        out float fake;
-        in vec2 v_texcoor;
-        in float v_id;
+        uniform sampler2D lamptex;
+        out highp vec4 f_color;
+        in highp vec2 v_texcoor;
+        in highp float v_id;
         
         void main()
         {
-            vec2 lamppos = texelFetch(lamptex, int(v_id), 0).xy * vec2(0.5,0.5) + vec2(.5,.5) ;
-            vec3 t = textureLod(tex, lamppos * vec2(1,-1), 3).rgb;
+            highp vec2 lamppos = texelFetch(lamptex, ivec2(int(v_id), 0), 0).xy * vec2(0.5,0.5) + vec2(.5,.5);
+            highp vec3 t = textureLod(tex, lamppos * vec2(1.0, -1.0), 3.0).rgb;
 			
-            f_color = vec4(t, 1);
+            f_color = vec4(t, 1.0);
         } """
         
     attributes = { 'position' : 3, 'id' : 1 }
@@ -63,10 +59,10 @@ class tree(geometry.base):
             data[i][2] = lamp[2];
         
         self.lamptex = gl.glGenTextures(1)
-        gl.glBindTexture(gl.GL_TEXTURE_1D, self.lamptex)
-        gl.glTexParameterf(gl.GL_TEXTURE_1D, gl.GL_TEXTURE_MAG_FILTER, gl.GL_NEAREST)
-        gl.glTexParameterf(gl.GL_TEXTURE_1D, gl.GL_TEXTURE_MIN_FILTER, gl.GL_NEAREST)
-        gl.glTexImage1D(gl.GL_TEXTURE_1D, 0, gl.GL_RGB16F, self.mapwidth, 0, gl.GL_RGB, gl.GL_FLOAT, data)
+        gl.glBindTexture(gl.GL_TEXTURE_2D, self.lamptex)
+        gl.glTexParameterf(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MAG_FILTER, gl.GL_NEAREST)
+        gl.glTexParameterf(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MIN_FILTER, gl.GL_NEAREST)
+        gl.glTexImage2D(gl.GL_TEXTURE_2D, 0, gl.GL_RGB16F, self.mapwidth, 1, 0, gl.GL_RGB, gl.GL_FLOAT, data)
 
         super(tree, self).__init__()
 
@@ -114,7 +110,7 @@ class tree(geometry.base):
         loc = gl.glGetUniformLocation(self.program, "lamptex")
         gl.glUniform1i(loc, 1)
         gl.glActiveTexture(gl.GL_TEXTURE1)
-        gl.glBindTexture(gl.GL_TEXTURE_1D, self.lamptex)
+        gl.glBindTexture(gl.GL_TEXTURE_2D, self.lamptex)
         
         super(tree, self).draw()
 
