@@ -141,7 +141,8 @@ glut.glutKeyboardFunc(keyboard)
 mainfbo = fbo.FBO(512, 512)
 
 # WS2811 output shader
-signalgenerator = geometry.ws2811.signalgenerator('tree.json')
+layoutfile = 'layout.json'
+signalgenerator = geometry.ws2811.signalgenerator(layoutfile)
 signalgenerator.setTexture(mainfbo.getTexture())
 
 # Emulation shader
@@ -149,7 +150,7 @@ texquad = geometry.simple.texquad()
 texquad.setTexture(mainfbo.getTexture())
 
 # Tree emulator
-tree = assembly.tree.tree()
+tree = assembly.tree.tree(layoutfile)
 tree.setTexture(mainfbo.getTexture())
 
 # Projection matrix
