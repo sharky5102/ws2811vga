@@ -13,7 +13,7 @@ xoff = - (x * size)/2
 points = []
 
 for i in range(0, n):
-    row = i / x
+    row = int(i / x)
     right = False if row % 2 else True
 
     column = i - (row * x)
