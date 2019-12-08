@@ -32,7 +32,7 @@ class signalgenerator(geometry.base):
         
         void main()
         {
-            int y = int(v_texcoor.y * 1000.0);
+            int y = int(v_texcoor.y * 500.0);
 			int pixel, bit;
 			lowp float bitoffset;
 			
@@ -55,7 +55,7 @@ class signalgenerator(geometry.base):
 			highp vec3 t;
 			
 			if (pixel > max_id) {
-				t = vec3(0.0, 0.0, 0.0);
+				t = vec3(1.0, 1.0, 1.0);
 			} else {
 				highp vec2 lamppos = texelFetch(lamptex, ivec2(pixel, 0), 0).xy * vec2(0.5,0.5) + vec2(.5,.5);
 				t = textureLod(tex, lamppos * vec2(1.0, -1.0), 3.0).rgb;
@@ -75,9 +75,9 @@ class signalgenerator(geometry.base):
             highp float color;
             
             if(bitvalue == 0)
-                color = bitoffset < 0.1 ? 1.0 : 0.0;
+                color = bitoffset < 0.2 ? 1.0 : 0.0;
             else
-                color = bitoffset < 0.48 ? 1.0 : 0.0;
+                color = bitoffset < 0.46 ? 1.0 : 0.0;
 
             f_color = vec4(color, color, color, 1);
             

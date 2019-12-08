@@ -1,7 +1,8 @@
+#!/usr/bin/python
 import math
 import json
 
-x = 32
+x = 1
 y = 8
 n = x * y
 size = min(2.0 / x, 2.0 / y)

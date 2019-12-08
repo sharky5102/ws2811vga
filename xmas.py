@@ -70,6 +70,8 @@ def render():
 def display():
     global args, mainfbo, texquad, signalgenerator
 
+    gl.glDisable(gl.GL_MULTISAMPLE)
+
     with mainfbo:
         render()
 
@@ -84,9 +86,9 @@ def display():
         texquad.render()
         
     else:
-
+        gl.glDisable(gl.GL_MULTISAMPLE)
         gl.glClearColor(0, 0, 0, 0)
-        gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+        gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
         
         if args.preview:   
             texquad.render()
@@ -98,6 +100,8 @@ def display():
     
 def reshape(width,height):
     global screenWidth, screenHeight
+    
+    print( width, height )
     
     screenWidth = width
     screenHeight = height
@@ -123,6 +127,7 @@ args = parser.parse_args()
 # GLUT init
 # --------------------------------------
 
+gl.glDisable(gl.GL_MULTISAMPLE)
 glut.glutInit()
 glut.glutInitDisplayMode(glut.GLUT_DOUBLE | glut.GLUT_RGBA)
 glut.glutCreateWindow(b'Amazing ws2811 VGA renderer')
@@ -172,4 +177,5 @@ if args.music:
 
 if not args.raw and not args.preview and not args.emulate:
     glut.glutFullScreen()
+print('Multisample: %d' % glut.glutGet(glut.GLUT_WINDOW_NUM_SAMPLES))
 glut.glutMainLoop()
