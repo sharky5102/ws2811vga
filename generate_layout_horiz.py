@@ -20,7 +20,7 @@ for i in range(0, n):
     if not right:
         column = x - 1 - column
     
-    points.append( (xoff + (column * size), yoff + (row * size), 0) )
+    points.append( (xoff + ((column+0.5) * size), yoff + ((row+0.5) * size), 0) )
 
 
 print(json.dumps(points))

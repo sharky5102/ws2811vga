@@ -58,7 +58,7 @@ class signalgenerator(geometry.base):
 				t = vec3(1.0, 1.0, 1.0);
 			} else {
 				highp vec2 lamppos = texelFetch(lamptex, ivec2(pixel, 0), 0).xy * vec2(0.5,0.5) + vec2(.5,.5);
-				t = textureLod(tex, lamppos * vec2(1.0, -1.0), 3.0).rgb;
+				t = textureLod(tex, lamppos, 3.0).rgb;
 			}
 			
             t = pow(t, vec3(2.2));
