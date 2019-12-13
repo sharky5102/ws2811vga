@@ -23,17 +23,17 @@ class copperbar(assembly.assembly):
     def render(self, t):
 
         r = math.cos(t/10) * math.pi * 2 * 5
-        n = (math.sin(t * math.pi * 2 / 5.3) + 1.2) / 1
+        n = (math.sin(t * math.pi * 2 / 5.3) + 1.2) / 3.1
 
         self.bars[0].setDirection((math.sin(r) * n , math.cos(r) * n))
 
         r = math.cos(t/11) * math.pi * 2 * 3 
-        n = (math.sin(t * math.pi * 2 / 4.7) + 1.2) / .7
+        n = (math.sin(t * math.pi * 2 / 4.7) + 1.2) / 2.7
 
         self.bars[1].setDirection((math.sin(r) * n / 2 , math.cos(r) * n))
 
         r = math.sin(t/17) * math.pi * 2 * 7 
-        n = (math.sin(t * math.pi * 2 / 6.7) + 1.2) / 1.1
+        n = (math.sin(t * math.pi * 2 / 6.7) + 1.2) / 1.5
 
         self.bars[2].setDirection((math.sin(r) * n , math.cos(r) * n))
 

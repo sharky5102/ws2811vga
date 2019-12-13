@@ -39,7 +39,7 @@ class stars(assembly.assembly):
 
         def render(self, t):
             reltime = t - self.start
-            alpha = math.fabs((self.life)-reltime) * 0.2
+            alpha = math.fabs((self.life)-reltime) 
             alpha *= ((1 + (math.sin((reltime + self.shift) * 10))) / 10.0) + 0.8
             self.star.color = self.color + (alpha,)
             M = np.eye(4, dtype=np.float32)
@@ -51,8 +51,8 @@ class stars(assembly.assembly):
         def step(self, dt):
             self.x = self.x + self.dx * dt
             self.y = self.y + self.dy * dt
-            self.dx *= 0.95
-            self.dy *= 0.95
+            self.dx *= 0.90
+            self.dy *= 0.90
 
         def setProjection(self, M):
             self.star.setProjection(M)
@@ -87,8 +87,8 @@ class stars(assembly.assembly):
         a = math.sin(0.11 * t * 2 * math.pi) * .3 * math.pi + math.sin(0.13 * t * 2 * math.pi) * .5 * math.pi
         l = math.sin(0.07 * t * 2 * math.pi) * 12
 
-        mx = math.sin(a) * l * 2
-        my = math.cos(a) * l * 0.5
+        mx = math.sin(a) * l * 1.5
+        my = math.cos(a) * l * 0.3
 
         return mx, my
 

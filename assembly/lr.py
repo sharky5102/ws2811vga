@@ -21,7 +21,6 @@ class lr(assembly.assembly):
 
         def render(self, t):
             self.pos = (math.cos(t) * 1, 0)
-            print(self.pos)
             self.update(t - self.reltime)
             M = np.eye(4, dtype=np.float32)
             transforms.scale(M, self.size, self.size, 1)

@@ -5,21 +5,21 @@ import cv2
 
 class video(geometry.simple.texquad):
     fragment_code = """
-        uniform sampler2DRect tex;
-        out vec4 f_color;
-        in vec2 v_texcoor;
+        uniform sampler2D tex;
+        out highp vec4 f_color;
+        in highp vec2 v_texcoor;
         
         void main()
         {
-            float pixsize_x = 1.0/50;
-            float pixsize_y = 1.0/10;
+            highp float pixsize_x = 1.0/50.0;
+            highp float pixsize_y = 1.0/10.0;
             
-            vec2 coor;
+            highp ivec2 coor;
             
-            coor.x = (floor(v_texcoor.x/pixsize_x)+0.5)*pixsize_x;
-            coor.y = (floor(v_texcoor.y/pixsize_y)+0.5)*pixsize_y;
+            coor.x = int(v_texcoor.x); // int((floor(v_texcoor.x/pixsize_x)+0.5)*pixsize_x);
+            coor.y = int(v_texcoor.y); // int((floor(v_texcoor.y/pixsize_y)+0.5)*pixsize_y);
 
-            f_color = texture(tex, coor);
+            f_color = texelFetch(tex, coor, 3);
         } """
         
     def __init__(self):
@@ -50,7 +50,7 @@ class video(geometry.simple.texquad):
         loc = gl.glGetUniformLocation(self.program, "tex")
         gl.glUniform1i(loc, 0)
         gl.glActiveTexture(gl.GL_TEXTURE0)
-        gl.glBindTexture(gl.GL_TEXTURE_RECTANGLE, self.tex)
+        gl.glBindTexture(gl.GL_TEXTURE_2D, self.tex)
         
         geometry.base.draw(self)
         
@@ -58,8 +58,8 @@ class video(geometry.simple.texquad):
         while self.frame / self.fps < t:
             ret, frame = self.cap.read()
                 
-            gl.glBindTexture(gl.GL_TEXTURE_RECTANGLE, self.tex)
-            gl.glTexImage2D(gl.GL_TEXTURE_RECTANGLE, 0, gl.GL_RGB, self.w, self.h, 0, gl.GL_BGR, gl.GL_UNSIGNED_BYTE, frame.tostring())
+            gl.glBindTexture(gl.GL_TEXTURE_2D, self.tex)
+            gl.glTexImage2D(gl.GL_TEXTURE_2D, 0, gl.GL_RGB, self.w, self.h, 0, gl.GL_BGR, gl.GL_UNSIGNED_BYTE, frame.tostring())
             self.frame += 1
 
         super(video, self).render()
