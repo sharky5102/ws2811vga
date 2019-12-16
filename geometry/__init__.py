@@ -35,6 +35,7 @@ class base(object):
         } """
 
     attributes = { 'color' : 4, 'position' : 2 }
+    instanceAttributes = {}
     primitive = gl.GL_TRIANGLES
 
     program = None
@@ -52,7 +53,8 @@ class base(object):
         identity = np.eye(4, dtype=np.float32)
         self.setModelView(identity);
         self.setProjection(identity);
-        (self.vertexBuffer, self.vertices) = self.loadGeometry();
+        (self.vertexBuffer, self.vertices, self.offsets, self.stride) = self.loadGeometry();
+        (self.instanceBuffer, self.instances, self.instanceOffsets, self.instanceStride) = self.loadInstances();
         self.color = (1,1,1,1)
 
     def __del__(self):
@@ -60,7 +62,11 @@ class base(object):
 
     def getVertices(self):
         """Override for useful geometry"""
-        return ([], [])
+        return { 'color' : [], 'position' : [] }
+        
+    def getInstances(self):
+        """Override for instancing"""
+        return {}
         
     def loadShaderProgram(self):
         # Request a program and shader slots from GPU
@@ -102,49 +108,57 @@ class base(object):
         return program
         
     def loadGeometry(self):
+        attrData = self.getVertices()
+        return self.loadAttribs(self.attributes, attrData)
+        
+    def loadInstances(self):
+        instanceData = self.getInstances()
+        return self.loadAttribs(self.instanceAttributes, instanceData)
+        
+    def loadAttribs(self, attrNames, attrData):
+        if not attrNames:
+            return (None, 1, 0, 0)
+            
         # Request a buffer slot from GPU
         buffer = gl.glGenBuffers(1)
 
         # Make this buffer the default one
         gl.glBindBuffer(gl.GL_ARRAY_BUFFER, buffer)
 
-        # Build data
-        verts = self.getVertices()
-        
         size = None
-        for attrib in verts:
+        for attrib, data in attrData.items():
             if size == None:
-                size = len(verts[attrib]) 
+                size = len(data) 
                 continue
-            if size != len(verts[attrib]):
+            if size != len(data):
                 raise RuntimeError('not all attribute arrays have the same length')
 
         format = []
-        for attrib in self.attributes:
-            format.append( (attrib, np.float32, self.attributes[attrib]) )
+        for attrib in attrNames:
+            format.append( (attrib, np.float32, attrNames[attrib]) )
 
         data = np.zeros(size, format)
 
         offset = 0
-        self.offsets = {}
-        for attrib in self.attributes:
-            data[attrib] = verts[attrib]
-            self.offsets[attrib] = ctypes.c_void_p(offset)
+        offsets = {}
+        for attrib in attrNames:
+            data[attrib] = attrData[attrib]
+            offsets[attrib] = ctypes.c_void_p(offset)
             offset += data.dtype[attrib].itemsize
 
-        self.stride = data.strides[0]
+        stride = data.strides[0]
 
         # Upload data
         gl.glBufferData(gl.GL_ARRAY_BUFFER, data.nbytes, data, gl.GL_DYNAMIC_DRAW)
 
-        return buffer, size
-    
+        return buffer, size, offsets, stride
+
     def setModelView(self, M):
         self.modelview = M
     
     def setProjection(self, M):
         self.projection = M
-    
+        
     def render(self):
         # Select our shaders
         gl.glUseProgram(self.program)
@@ -170,9 +184,18 @@ class base(object):
             gl.glEnableVertexAttribArray(loc)
             gl.glBindBuffer(gl.GL_ARRAY_BUFFER, self.vertexBuffer)
             gl.glVertexAttribPointer(loc, self.attributes[attrib], gl.GL_FLOAT, False, self.stride, self.offsets[attrib])
-
+            gl.glVertexAttribDivisor(loc, 0); 
+            
+        for attrib in self.instanceAttributes:
+            loc = gl.glGetAttribLocation(self.program, attrib)
+            if loc < 0:
+                raise RuntimeError('Instance attribute %s not found in program' % attrib)
+            gl.glEnableVertexAttribArray(loc)
+            gl.glBindBuffer(gl.GL_ARRAY_BUFFER, self.instanceBuffer)
+            gl.glVertexAttribPointer(loc, self.instanceAttributes[attrib], gl.GL_FLOAT, False, self.instanceStride, self.instanceOffsets[attrib])
+            gl.glVertexAttribDivisor(loc, 1); 
+            
         self.draw()
         
     def draw(self):
-        
-        gl.glDrawArrays(self.primitive, 0, self.vertices)
+        gl.glDrawArraysInstanced(self.primitive, 0, self.vertices, self.instances)

@@ -14,6 +14,24 @@ class stars(assembly.assembly):
         primitive = gl.GL_QUADS
         dfactor = gl.GL_ONE
 
+        instanceAttributes = { 'offset' : 2 }
+
+        vertex_code = """
+            uniform mat4 modelview;
+            uniform mat4 projection;
+            uniform vec4 objcolor;
+
+            in highp vec4 color;
+            in highp vec2 position;
+            in highp vec2 offset;
+            out highp vec4 v_color;
+            void main()
+            {
+                gl_Position = projection * modelview * vec4(position + offset,0.0,1.0);
+                v_color =  objcolor * color;
+            } 
+        """
+
         def __init__(self):
             self.starcolor = (1,1,1,1)
 
@@ -24,6 +42,11 @@ class stars(assembly.assembly):
             colors = [self.starcolor, self.starcolor, self.starcolor, self.starcolor]
 
             return { 'position' : verts, 'color' : colors }
+
+        def getInstances(self):
+            offset = [ (0, 0) ]
+
+            return { 'offset' : offset }
 
     class AnimatedStar:
         def __init__(self, start, x, y, dx, dy, life, color):
