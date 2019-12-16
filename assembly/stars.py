@@ -10,11 +10,12 @@ class stars(assembly.assembly):
     freq = 40
     life = 2
 
-    class Star(geometry.base):
+    class Stars(geometry.base):
         primitive = gl.GL_QUADS
         dfactor = gl.GL_ONE
 
-        instanceAttributes = { 'offset' : 2 }
+        instanceAttributes = { 'offset' : 2, 'color' : 4 }
+        attributes = { 'position' : 2 }
 
         vertex_code = """
             uniform mat4 modelview;
@@ -34,59 +35,52 @@ class stars(assembly.assembly):
 
         def __init__(self):
             self.starcolor = (1,1,1,1)
+            self.positions = []
+            self.colors = []
 
-            super(stars.Star, self).__init__()
+            super(stars.Stars, self).__init__()
     
         def getVertices(self):
             verts = [(0, 0), (+1, 0), (+1, +1), (0, +1)]
             colors = [self.starcolor, self.starcolor, self.starcolor, self.starcolor]
 
             return { 'position' : verts, 'color' : colors }
+            
+        def setStars(self, positions, colors):
+            self.positions = positions
+            self.colors = colors
+            self.reloadInstanceData()
 
         def getInstances(self):
-            offset = [ (0, 0) ]
-
-            return { 'offset' : offset }
+            return { 'offset' : self.positions, 'color' : self.colors }
 
     class AnimatedStar:
-        def __init__(self, start, x, y, dx, dy, life, color):
+        def __init__(self, start, x, y, dx, dy, life, basecolor):
             self.start = start
-            self.star = stars.Star()
             self.x = x
             self.y = y
             self.dx = dx
             self.dy = dy
             self.life = life
-            self.color = color
+            self.basecolor = basecolor
             self.shift = random.uniform(0,0.1)
 
-        def render(self, t):
-            reltime = t - self.start
-            alpha = math.fabs((self.life)-reltime) 
-            alpha *= ((1 + (math.sin((reltime + self.shift) * 10))) / 10.0) + 0.8
-            self.star.color = self.color + (alpha,)
-            M = np.eye(4, dtype=np.float32)
-            transforms.translate(M, self.x, self.y , 0)
-            transforms.scale(M, 1.0/25, 1.0/25, 1)
-            self.star.setModelView(M)
-            self.star.render()
-
-        def step(self, dt):
+        def step(self, t, dt):
             self.x = self.x + self.dx * dt
             self.y = self.y + self.dy * dt
-            self.dx *= 0.90
-            self.dy *= 0.90
+            self.dx *= 0.98
+            self.dy *= 0.98
 
-        def setProjection(self, M):
-            self.star.setProjection(M)
-
+            reltime = t - self.start
+            alpha = math.fabs((self.life)-reltime) 
+            alpha *= ((1 + (math.sin((reltime + self.shift) * 10))) / 10.0) + 0.2
+            self.color = self.basecolor + (alpha * 4,)
 
     def __init__(self):
         self.stars = []
+        self.geometry = stars.Stars()
         self.last = 0
         self.lastx = self.lasty = 0
-        self.star = stars.Star()
-        self.star.color = (1,1,1,1)
 
     def addstar(self, t, dx, dy):
         while self.stars and t-self.stars[0].start > self.life:
@@ -128,16 +122,18 @@ class stars(assembly.assembly):
 
         self.last = t
 
+        positions = []
+        colors = []
         for star in self.stars:
-            star.setProjection(self.projection)
-            star.step(dt)
-            star.render(t)
+            star.step(t, dt)
+            positions.append((star.x, star.y))
+            colors.append(star.color)
 
         M = np.eye(4, dtype=np.float32)
-        transforms.translate(M, x, y , 0)
         transforms.scale(M, 1.0/25, 1.0/25, 1)
-        self.star.setModelView(M)
-        self.star.render()			
+        self.geometry.setStars(positions, colors)
+        self.geometry.setModelView(M)
+        self.geometry.render()			
 
     def setProjection(self, M):
         self.projection = M

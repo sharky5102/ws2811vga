@@ -53,8 +53,8 @@ class base(object):
         identity = np.eye(4, dtype=np.float32)
         self.setModelView(identity);
         self.setProjection(identity);
-        (self.vertexBuffer, self.vertices, self.offsets, self.stride) = self.loadGeometry();
-        (self.instanceBuffer, self.instances, self.instanceOffsets, self.instanceStride) = self.loadInstances();
+        (self.vertexBuffer, self.vertices, self.offsets, self.stride) = self.loadGeometry()
+        (self.instanceBuffer, self.instances, self.instanceOffsets, self.instanceStride) = self.loadInstances()
         self.color = (1,1,1,1)
 
     def __del__(self):
@@ -67,6 +67,9 @@ class base(object):
     def getInstances(self):
         """Override for instancing"""
         return {}
+        
+    def reloadInstanceData(self):
+        self.instances = self.loadAttribData(self.instanceBuffer, self.instanceAttributes, self.getInstances())
         
     def loadShaderProgram(self):
         # Request a program and shader slots from GPU
@@ -114,16 +117,14 @@ class base(object):
     def loadInstances(self):
         instanceData = self.getInstances()
         return self.loadAttribs(self.instanceAttributes, instanceData)
-        
-    def loadAttribs(self, attrNames, attrData):
-        if not attrNames:
-            return (None, 1, 0, 0)
-            
-        # Request a buffer slot from GPU
-        buffer = gl.glGenBuffers(1)
 
+    def loadAttribData(self, buffer, attrNames, attrData):
         # Make this buffer the default one
         gl.glBindBuffer(gl.GL_ARRAY_BUFFER, buffer)
+
+        format = []
+        for attrib in attrNames:
+            format.append( (attrib, np.float32, attrNames[attrib]) )
 
         size = None
         for attrib, data in attrData.items():
@@ -133,23 +134,41 @@ class base(object):
             if size != len(data):
                 raise RuntimeError('not all attribute arrays have the same length')
 
+        data = np.zeros(size, format)
+
+        for attrib in attrNames:
+            if attrData[attrib]:
+                data[attrib] = attrData[attrib]
+
+        # Upload data
+        gl.glBufferData(gl.GL_ARRAY_BUFFER, data.nbytes, data, gl.GL_DYNAMIC_DRAW)
+        
+        return size
+        
+    def loadAttribs(self, attrNames, attrData):
+        if not attrNames:
+            return (None, 1, 0, 0)
+            
+        # Request a buffer slot from GPU
+        buffer = gl.glGenBuffers(1)
+
         format = []
         for attrib in attrNames:
             format.append( (attrib, np.float32, attrNames[attrib]) )
 
-        data = np.zeros(size, format)
+        data = np.zeros(1, format)
 
         offset = 0
         offsets = {}
         for attrib in attrNames:
-            data[attrib] = attrData[attrib]
             offsets[attrib] = ctypes.c_void_p(offset)
             offset += data.dtype[attrib].itemsize
 
         stride = data.strides[0]
 
         # Upload data
-        gl.glBufferData(gl.GL_ARRAY_BUFFER, data.nbytes, data, gl.GL_DYNAMIC_DRAW)
+        if attrNames:
+            size = self.loadAttribData(buffer, attrNames, attrData)
 
         return buffer, size, offsets, stride
 
