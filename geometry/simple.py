@@ -47,26 +47,30 @@ class texquad(geometry.base):
     vertex_code = """
         uniform mat4 modelview;
         uniform mat4 projection;
+        uniform vec4 objcolor;
         
         in highp vec2 position;
         in highp vec2 texcoor;
 
         out highp vec2 v_texcoor;
+        out highp vec4 v_color;
         
         void main()
         {
             gl_Position = projection * modelview * vec4(position,0.0,1.0);
             v_texcoor = texcoor;
+            v_color = objcolor;
         } """
 
     fragment_code = """
         uniform sampler2D tex;
         out highp vec4 f_color;
         in highp vec2 v_texcoor;
+        in highp vec4 v_color;
         
         void main()
         {
-            f_color = textureLod(tex, v_texcoor, 0.0);
+            f_color = textureLod(tex, v_texcoor, 0.0) * v_color;
         } """
         
     attributes = { 'position' : 2, 'texcoor' : 2 }
@@ -89,6 +93,20 @@ class texquad(geometry.base):
 
     def setTexture(self, tex):
         self.tex = tex
+
+class alphatexquad(texquad):
+    fragment_code = """
+        uniform sampler2D tex;
+        out highp vec4 f_color;
+        in highp vec2 v_texcoor;
+        in highp vec4 v_color;
+        
+        void main()
+        {
+            f_color = vec4(v_color.rgb, v_color.a * textureLod(tex, v_texcoor, 0.0).r);
+        } """
+        
+
 
 class ballquad(geometry.base):
     vertex_code = """
@@ -228,3 +246,53 @@ class copper(texquad):
 
     def setColor(self, color):
         self.color = color
+
+class lodtexquad(texquad):
+    fragment_code = """
+        uniform sampler2D tex;
+        out highp vec4 f_color;
+        in highp vec2 v_texcoor;
+        in highp vec4 v_color;
+        
+        void main()
+        {
+            f_color = textureLod(tex, v_texcoor, 0.0) * v_color;
+        } """
+
+class blurtexquad(texquad):
+    fragment_code = """
+        uniform sampler2D tex;
+        out highp vec4 f_color;
+        in highp vec2 v_texcoor;
+        
+        void main()
+        {
+            highp vec4 acc;
+            lowp float n = 0.0;
+            for(int i = - 8; i < 9; i++) {
+                lowp float weight = 1.0; //8.0 - abs(float(i));
+                acc += textureLod(tex, v_texcoor + vec2(0.01*float(i)/8.0, 0.0), 0.0) * weight;
+                n += weight;
+            }
+            
+            f_color = 1.4 * acc / n;
+        } """
+
+class vblurtexquad(texquad):
+    fragment_code = """
+        uniform sampler2D tex;
+        out highp vec4 f_color;
+        in highp vec2 v_texcoor;
+        
+        void main()
+        {
+            highp vec4 acc;
+            lowp float n = 0.0;
+            for(int i = - 8; i < 9; i++) {
+                lowp float weight = 1.0; //8.0 - abs(float(i));
+                acc += textureLod(tex, v_texcoor + vec2(0.0, 0.01*float(i)/8.0), 0.0) * weight;
+                n += weight;
+            }
+            
+            f_color = 1.4 * acc / n;
+        } """

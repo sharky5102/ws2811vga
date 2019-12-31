@@ -1,6 +1,7 @@
 import assembly
 import random
 import geometry.tree
+import geometry.simple
 import OpenGL.GL as gl
 import numpy as np
 import transforms
@@ -12,6 +13,7 @@ class tree():
         f = open(filename, 'rt')
         data = f.read()
         self.tree = geometry.tree.tree(data)
+        self.lt = geometry.simple.texquad()
         
     def setProjection(self, M):
         self.projection = M
@@ -34,7 +36,9 @@ class tree():
         self.tree.setProjection(projection)
         self.tree.setModelView(M)
         self.tree.render()
+        self.lt.render()
         gl.glDisable(gl.GL_DEPTH_TEST)
 
     def setTexture(self, tex):
         self.tree.setTexture(tex)
+        self.lt.setTexture(tex)

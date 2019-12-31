@@ -7,7 +7,7 @@ import math
 import colorsys
 
 class circles(assembly.assembly):
-    freq = 4    
+    freq = 8
     class circle(object):
         def __init__(self, pos, reltime, color):
             self.pos = pos
@@ -45,7 +45,7 @@ class circles(assembly.assembly):
     def addCircle(self):
         if not self.time:
             return
-        c = self.circle((random.uniform(-1, 1), random.uniform(-1, 1)), self.time, random.choice(self.colors))
+        c = self.circle((random.uniform(-1, 1), random.uniform(-.2, .2)), self.time, random.choice(self.colors))
         self.circles.append(c)
 
     def render(self, t):

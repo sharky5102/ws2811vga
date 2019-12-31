@@ -194,7 +194,7 @@ class base(object):
         loc = gl.glGetUniformLocation(self.program, "objcolor")
         gl.glUniform4fv(loc, 1, self.color)
 
-        gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE)
+        gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
 
         for attrib in self.attributes:
             loc = gl.glGetAttribLocation(self.program, attrib)

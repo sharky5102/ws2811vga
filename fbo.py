@@ -30,6 +30,7 @@ class FBO:
         glViewport(0, 0, self.width, self.height);
         
     def __exit__(self, type, value, traceback):
+        glGenerateMipmap(GL_TEXTURE_2D)
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0)
         glPopAttrib()
         

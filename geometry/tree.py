@@ -36,7 +36,7 @@ class tree(geometry.base):
         void main()
         {
             highp vec2 lamppos = texelFetch(lamptex, ivec2(int(v_id), 0), 0).xy * vec2(0.5,0.5) + vec2(.5,.5);
-            highp vec3 t = textureLod(tex, lamppos, 3.0).rgb;
+            highp vec3 t = textureLod(tex, lamppos, 0.0).rgb;
 			
             f_color = vec4(t, 1.0);
         } """
@@ -46,6 +46,9 @@ class tree(geometry.base):
     def __init__(self, jsondata):
         self.lamps = json.loads(jsondata)
         self.tex = 0
+        
+        for lamp in self.lamps:
+            lamp[1] = -lamp[1]
 
         # Present the lamp locations as a 1d texture
         self.mapwidth = pow(2, math.ceil(math.log(len(self.lamps))/math.log(2)))

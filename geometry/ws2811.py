@@ -100,7 +100,7 @@ class signalgenerator(geometry.base):
         for i in range(0, len(self.lamps)):
             lamp = self.lamps[i]
             data[i][0] = lamp[0];
-            data[i][1] = lamp[1];
+            data[i][1] = -lamp[1];
             data[i][2] = lamp[2];
         
         self.lamptex = gl.glGenTextures(1)
