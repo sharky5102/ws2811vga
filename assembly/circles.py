@@ -7,7 +7,7 @@ import math
 import colorsys
 
 class circles(assembly.assembly):
-    freq = 8
+    freq = 4
     class circle(object):
         def __init__(self, pos, reltime, color):
             self.pos = pos
@@ -37,7 +37,7 @@ class circles(assembly.assembly):
         self.circles = []
         self.time = None
         self.last = 0
-        ncolors = 2
+        ncolors = 3
         basehue = random.uniform(0, 1)
 
         self.colors = [colorsys.hsv_to_rgb(basehue + float(i)/ncolors, 1, 1) for i in range(0,ncolors)]

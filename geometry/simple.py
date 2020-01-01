@@ -7,6 +7,9 @@ import ctypes
 from PIL import Image
 
 class circle(geometry.base):
+    srcblend = gl.GL_SRC_ALPHA
+    dstblend = gl.GL_ONE
+    
     segs = 16
     def __init__(self):
         self.color = (1,1,1,1)
