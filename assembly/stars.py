@@ -68,13 +68,13 @@ class stars(assembly.assembly):
         def step(self, t, dt):
             self.x = self.x + self.dx * dt
             self.y = self.y + self.dy * dt
-            self.dx *= 0.98
-            self.dy *= 0.98
+            self.dx *= 0.95
+            self.dy *= 0.95
 
             reltime = t - self.start
             alpha = math.fabs((self.life)-reltime) 
-            alpha *= ((1 + (math.sin((reltime + self.shift) * 10))) / 10.0) + 0.2
-            self.color = self.basecolor + (alpha * 4,)
+#            alpha *= ((1 + (math.sin((reltime + self.shift) * 10))) / 10.0) + 0.2
+            self.color = self.basecolor + (alpha*2 ,)
 
     def __init__(self):
         self.stars = []
