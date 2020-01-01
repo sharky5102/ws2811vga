@@ -69,14 +69,6 @@ def display():
         t = reltime()
         effect.render(t)
         
-    with vsmoothfbo:
-        clear()
-        vblurquad.render()
-
-    with smoothfbo:
-        clear()
-        blurquad.render()
-
     if args.emulate:
         gl.glClearColor(0, 0, 0, 0)    
         gl.glClear(gl.GL_COLOR_BUFFER_BIT| gl.GL_DEPTH_BUFFER_BIT)
@@ -145,21 +137,10 @@ glut.glutKeyboardFunc(keyboard)
 # Primary offscreen framebuffer
 mainfbo = fbo.FBO(512, 512)
 
-# Primary offscreen framebuffer
-vsmoothfbo = fbo.FBO(512, 512)
-smoothfbo = fbo.FBO(512, 512)
-
-# Smoother
-vblurquad = geometry.simple.vblurtexquad()
-vblurquad.setTexture(mainfbo.getTexture())
-
-blurquad = geometry.simple.blurtexquad()
-blurquad.setTexture(vsmoothfbo.getTexture())
-
 # WS2811 output shader
 layoutfile = 'layout.json'
 signalgenerator = geometry.ws2811.signalgenerator(layoutfile)
-signalgenerator.setTexture(smoothfbo.getTexture())
+signalgenerator.setTexture(mainfbo.getTexture())
 
 # Emulation shader
 texquad = geometry.simple.texquad()
@@ -167,7 +148,7 @@ texquad.setTexture(mainfbo.getTexture())
 
 # Tree emulator
 tree = assembly.tree.tree(layoutfile)
-tree.setTexture(smoothfbo.getTexture())
+tree.setTexture(mainfbo.getTexture())
 
 # Projection matrix
 M = np.eye(4, dtype=np.float32)

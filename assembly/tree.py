@@ -36,7 +36,7 @@ class tree():
         self.tree.setProjection(projection)
         self.tree.setModelView(M)
         self.tree.render()
-        self.lt.render()
+#        self.lt.render()
         gl.glDisable(gl.GL_DEPTH_TEST)
 
     def setTexture(self, tex):

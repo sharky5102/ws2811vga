@@ -1,7 +1,8 @@
 ﻿import geometry
 import geometry.simple
 import OpenGL.GL as gl
-import cv2
+import time
+from ffpyplayer.player import MediaPlayer
 
 class video(geometry.simple.texquad):
     fragment_code = """
@@ -21,17 +22,22 @@ class video(geometry.simple.texquad):
         
     def __init__(self):
         self.filename = 'frozen.mp4'
-        self.cap = cv2.VideoCapture(self.filename)
-        self.fps = self.cap.get(cv2.CAP_PROP_FPS)
-        self.frame = 0
-        self.w = self.cap.get(cv2.CAP_PROP_FRAME_WIDTH)
-        self.h = self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        self.player = MediaPlayer(self.filename, loop=0)
+
+        while True:
+            frame, val = self.player.get_frame()
+        
+            if frame:
+                img, t = frame
+                size = img.get_size()
+                break
+        
+        self.w = size[0]
+        self.h = size[1]
         self.tex = gl.glGenTextures(1)
         self.n = 0
-        self.lastttime = 0
         
         super(video, self).__init__()
-        
 
     def getVertices(self):
         aspect = float(self.h)/float(self.w)
@@ -49,14 +55,19 @@ class video(geometry.simple.texquad):
         geometry.base.draw(self)
         
     def render(self, t):
-        while self.frame / self.fps < t:
-            ret, frame = self.cap.read()
-                
+        frame, val = self.player.get_frame()
+
+        if frame:
+            img, t = frame
+
             gl.glBindTexture(gl.GL_TEXTURE_2D, self.tex)
-            data = frame.tostring()
+            data = img.to_bytearray()[0]
+            size = img.get_size()
+            data = bytes(data)
             gl.glTexParameterf(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MAG_FILTER, gl.GL_NEAREST)
             gl.glTexParameterf(gl.GL_TEXTURE_2D, gl.GL_TEXTURE_MIN_FILTER, gl.GL_NEAREST)
-            gl.glTexImage2D(gl.GL_TEXTURE_2D, 0, gl.GL_RGB, self.w, self.h, 0, gl.GL_BGR, gl.GL_UNSIGNED_BYTE, data)
-            self.frame += 1
+            gl.glTexImage2D(gl.GL_TEXTURE_2D, 0, gl.GL_RGB, size[0], size[1], 0, gl.GL_RGB, gl.GL_UNSIGNED_BYTE, data)
+
+            time.sleep(val)
 
         super(video, self).render()
