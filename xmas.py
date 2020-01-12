@@ -34,6 +34,7 @@ import assembly.tree
 import assembly.rotate
 
 import geometry.ws2811
+import geometry.hub75e
 
 start = time.time()
 lastTime = 0
@@ -113,6 +114,7 @@ parser.add_argument('--emulate', action='store_const', const=True, help='Emulate
 parser.add_argument('--preview', action='store_const', const=True, help='Preview windows instead of actual output')
 parser.add_argument('--raw', action='store_const', const=True, help='Raw mode - use with --preview to view raw pixel data')
 parser.add_argument('--music', action='store_const', const=True, help='Sync to music')
+parser.add_argument('--display', default='ws2811', help='Display type (ws2811, hub75e)')
 parser.add_argument('effect', help='Effect to use')
 
 args = parser.parse_args()
@@ -139,8 +141,13 @@ mainfbo = fbo.FBO(512, 512)
 
 # WS2811 output shader
 layoutfile = 'layout.json'
-signalgenerator = geometry.ws2811.signalgenerator(layoutfile)
-signalgenerator.setTexture(mainfbo.getTexture())
+
+if args.display == 'ws2811':
+    signalgenerator = geometry.ws2811.signalgenerator(layoutfile)
+    signalgenerator.setTexture(mainfbo.getTexture())
+elif args.display == 'hub75e':
+    signalgenerator = geometry.hub75e.signalgenerator()
+    signalgenerator.setTexture(mainfbo.getTexture())
 
 # Emulation shader
 texquad = geometry.simple.texquad()

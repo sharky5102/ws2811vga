@@ -41,7 +41,8 @@ class video(geometry.simple.texquad):
 
     def getVertices(self):
         aspect = float(self.h)/float(self.w)
-        verts = [(-1, +aspect), (+1, +aspect), (+1, -aspect), (-1, -aspect)]
+#        verts = [(-1, +aspect), (+1, +aspect), (+1, -aspect), (-1, -aspect)]
+        verts = [(-1/aspect, 1), (+1/aspect, 1), (+1/aspect, -1), (-1/aspect, -1)]
         coors = [(self.w, 0), (0, 0), (0, self.h), (self.w, self.h)]
         
         return { 'position' : verts, 'texcoor' : coors }
