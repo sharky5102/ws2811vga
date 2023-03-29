@@ -47,8 +47,7 @@ def reltime():
     global start, lastTime, args
 
     if args.music:
-#        t = ((pygame.mixer.music.get_pos()-1157) / 454.3438) 
-         t = ((pygame.mixer.music.get_pos()-1100) / 454.3438) 
+         t = ((pygame.mixer.music.get_pos()-1100) / 454.3438)
     else:
         t = time.time() - start
 
@@ -70,25 +69,12 @@ def display():
         t = reltime()
         effect.render(t)
         
-    if args.emulate:
-        gl.glClearColor(0, 0, 0, 0)    
-        gl.glClear(gl.GL_COLOR_BUFFER_BIT| gl.GL_DEPTH_BUFFER_BIT)
-        
-        gl.glViewport(0, 0, int(screenWidth/2), screenHeight)
-        tree.render(reltime())
-        
-        gl.glViewport(int(screenWidth/2), 0, int(screenWidth/2), screenHeight)
-        texquad.render()
-        
-    else:
-        gl.glClearColor(0, 0, 0, 0)
-        gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
-        
-        if args.preview:   
-            texquad.render()
-        else:
-            signalgenerator.render()
-                
+    gl.glClearColor(0, 0, 0, 0)
+    gl.glClear(gl.GL_COLOR_BUFFER_BIT| gl.GL_DEPTH_BUFFER_BIT)
+
+    gl.glViewport(0, 0, screenWidth, screenHeight)
+    texquad.render()
+
     glut.glutSwapBuffers()
     glut.glutPostRedisplay()
     
@@ -110,12 +96,8 @@ def keyboard( key, x, y ):
         print('%d', pygame.mixer.music.get_pos())
 
 parser = argparse.ArgumentParser(description='Amazing WS2811 VGA driver')
-parser.add_argument('--emulate', action='store_const', const=True, help='Emulate tree')
-parser.add_argument('--preview', action='store_const', const=True, help='Preview windows instead of actual output')
-parser.add_argument('--raw', action='store_const', const=True, help='Raw mode - use with --preview to view raw pixel data')
 parser.add_argument('--music', action='store_const', const=True, help='Sync to music')
-parser.add_argument('--display', default='ws2811', help='Display type (ws2811, hub75e)')
-parser.add_argument('effect', help='Effect to use')
+parser.add_argument('--fullscreen', action='store_true', help='Fullscreen mode')
 
 args = parser.parse_args()
 
@@ -125,12 +107,7 @@ args = parser.parse_args()
 glut.glutInit()
 glut.glutInitDisplayMode(glut.GLUT_DOUBLE | glut.GLUT_RGBA)
 glut.glutCreateWindow(b'Amazing ws2811 VGA renderer')
-if args.preview or args.raw:
-    glut.glutReshapeWindow(1500,300)
-elif args.emulate:
-    glut.glutReshapeWindow(1000, 500)
-else:
-    glut.glutReshapeWindow(840,1000)
+glut.glutReshapeWindow(1000,1000)
 
 glut.glutReshapeFunc(reshape)
 glut.glutDisplayFunc(display)
@@ -139,41 +116,23 @@ glut.glutKeyboardFunc(keyboard)
 # Primary offscreen framebuffer
 mainfbo = fbo.FBO(512, 512)
 
-# WS2811 output shader
-layoutfile = 'layout.json'
-
-if args.display == 'ws2811':
-    signalgenerator = geometry.ws2811.signalgenerator(layoutfile)
-    signalgenerator.setTexture(mainfbo.getTexture())
-elif args.display == 'hub75e':
-    signalgenerator = geometry.hub75e.signalgenerator()
-    signalgenerator.setTexture(mainfbo.getTexture())
-
 # Emulation shader
 texquad = geometry.simple.texquad()
 texquad.setTexture(mainfbo.getTexture())
-
-# Tree emulator
-tree = assembly.tree.tree(layoutfile)
-tree.setTexture(mainfbo.getTexture())
 
 # Projection matrix
 M = np.eye(4, dtype=np.float32)
 transforms.scale(M, 1, 1, 1)
 
 # Effect
-try:
-    i = __import__('assembly.%s' % args.effect)
+import assembly.newyear
 
-    effect = getattr(getattr(i, args.effect), args.effect)()
-    effect.setProjection(M)
-except ImportError:
-    print('Unable to initialize effect %s' % args.effect)
-    raise
+effect = assembly.newyear.newyear()
+effect.setProjection(M)
 
 if args.music:
 	start_music()
 
-if not args.raw and not args.preview and not args.emulate:
+if args.fullscreen:
     glut.glutFullScreen()
 glut.glutMainLoop()

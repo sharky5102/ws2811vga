@@ -2,21 +2,20 @@
 import random
 import geometry
 import geometry.simple
-import geometry.glyphquad
 import OpenGL.GL as gl
 import numpy as np
 import transforms
 import math
-import freetype
 from datetime import datetime
 
 class newyear(assembly.assembly):
-    freq = 40
-    life = 2
+    freq = 140
+    life = 4
 
     class Stars(geometry.base):
         primitive = gl.GL_QUADS
-        dfactor = gl.GL_ONE
+        srcblend = gl.GL_SRC_ALPHA
+        dstblend = gl.GL_ONE
 
         instanceAttributes = { 'offset' : 2, 'color' : 4 }
         attributes = { 'position' : 2 }
@@ -45,7 +44,7 @@ class newyear(assembly.assembly):
             super(newyear.Stars, self).__init__()
     
         def getVertices(self):
-            verts = [(0, 0), (+1, 0), (+1, +1), (0, +1)]
+            verts = [(-1, -1), (+1, -1), (+1, +1), (-1, +1)]
             colors = [self.starcolor, self.starcolor, self.starcolor, self.starcolor]
 
             return { 'position' : verts, 'color' : colors }
@@ -67,27 +66,24 @@ class newyear(assembly.assembly):
             self.dy = dy
             self.life = life
             self.basecolor = basecolor
-            self.shift = random.uniform(0,0.1)
+            self.shift = random.uniform(0,1)
 
         def step(self, t, dt):
             self.x = self.x + self.dx * dt
             self.y = self.y + self.dy * dt
-            self.dx *= 0.98
-            self.dy *= 0.98
+            self.dx -= (0.005 * dt * math.pow(self.dx, 3))
+            self.dy -= (0.005 * dt * math.pow(self.dy, 3))
 
             reltime = t - self.start
             alpha = math.fabs((self.life)-reltime) 
             alpha *= ((1 + (math.sin((reltime + self.shift) * 10))) / 10.0) + 0.2
-            self.color = self.basecolor + (alpha * 4,)
+            self.color = self.basecolor + (alpha/2,)
 
     def __init__(self):
         self.stars = []
         self.geometry = newyear.Stars()
         self.digits = []
-        for i in range(0, 10):
-            digit = geometry.glyphquad.glyphquad('./Vera.ttf', 96*64, str(i))
-            digit.color = (1, 1, 1, 1)
-            self.digits.append(digit)
+        #for i in range(0, 10):
         self.last = 0
         self.lastx = self.lasty = 0
 
@@ -95,39 +91,40 @@ class newyear(assembly.assembly):
         while self.stars and t-self.stars[0].start > self.life:
             self.stars = self.stars[1:]
 
-#        if len(self.stars) > 50:
-#            return
-
         x, y = self.getCenter(t)
 
-        w = 1
+        w = 5
 
-        dx += w*random.uniform(-1, 1) * 10
-        dy += w*random.uniform(-1, 1) * 10
+        a = random.uniform(0, math.pi * 2)
+        dx += w*math.cos(a)
+        dy += w*math.sin(a)
         
-        color = random.choice([(1,0.8,0.2), (1,0.9,0.7)])
+        color = random.choice([(1,0.8,0.2), (1,0.9,0.6)])
 
         self.stars.append(newyear.AnimatedStar(t, x, y, dx, dy, self.life, color))
 
-    def getCenter(self, t): 
+    def getCenter(self, t):
+        t = t * 4
         a = math.sin(0.11 * t * 2 * math.pi) * .3 * math.pi + math.sin(0.13 * t * 2 * math.pi) * .5 * math.pi
         l = math.sin(0.07 * t * 2 * math.pi) * 12
 
         mx = math.sin(a) * l * 1.5
-        my = math.cos(a) * l * 0.3
+        my = math.cos(a) * l * 1.5
 
         return mx, my
 
     def render(self, t):
         dt = t - self.last
         x,y = self.getCenter(t)
-        dx = (x - self.lastx)/dt
-        dy = (y - self.lasty)/dt
+
+        if int(t*self.freq) > int(self.last*self.freq) and dt > 0:
+            dx = (x - self.lastx)/dt
+            dy = (y - self.lasty)/dt
+
+            self.addstar(t, dx, dy)
+
         self.lastx = x
         self.lasty = y
-
-        if int(t*self.freq) > int(self.last*self.freq):
-            self.addstar(t, dx, dy)
 
         self.last = t
 
@@ -139,7 +136,7 @@ class newyear(assembly.assembly):
             colors.append(star.color)
 
         M = np.eye(4, dtype=np.float32)
-        transforms.scale(M, 1.0/25, 1.0/25, 1)
+        transforms.scale(M, 1.0/50, 1.0/50, 1)
         self.geometry.setStars(positions, colors)
         self.geometry.setModelView(M)
         self.geometry.render()			
@@ -149,21 +146,6 @@ class newyear(assembly.assembly):
         digits = [ now.hour / 10, now.hour % 10, now.minute / 10, now.minute % 10, now.second / 10, now.second % 10 ]
         digits = [ int(x) for x in digits ]
         
-        n = 0
-        for digit in digits:
-            M = np.eye(4, dtype=np.float32)
-            d = now.microsecond / 1000000
-            s = 1.2 - d * 0.2
-            transforms.scale(M, s, s, 1)
-            transforms.scale(M, 1.0/12, -1.0/10, 1)
-            transforms.translate(M, -.8 + (n * 0.3 ) , 0, 0)
-            if n % 2 == 0:
-                transforms.translate(M, 0.1 , 0, 0)
-            self.digits[digit].setModelView(M)
-            #self.digits[digit].color = (1,1,1, 0.5 + (1-d) * 0.5)
-            self.digits[digit].render()
-            n += 1
-
     def setProjection(self, M):
         self.projection = M
 
